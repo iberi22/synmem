@@ -136,12 +136,16 @@ pub trait SessionServiceTrait: Send + Sync {
 }
 
 /// Default implementation of the session service
+///
+/// # Note
+/// This is a placeholder implementation. The actual implementation will need:
+/// - Database connection pool
+/// - Encryption service for session data
+/// - Sync protocol handler
+///
+/// TODO: Implement `SessionServiceTrait` when infrastructure is ready
 #[derive(Default)]
 pub struct SessionService {
-    // In a real implementation, this would contain:
-    // - Database connection pool
-    // - Encryption service for session data
-    // - Sync protocol handler
     _private: (),
 }
 

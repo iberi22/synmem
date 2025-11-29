@@ -63,12 +63,16 @@ pub trait AuthServiceTrait: Send + Sync {
 }
 
 /// Default implementation of the authentication service
+///
+/// # Note
+/// This is a placeholder implementation. The actual implementation will need:
+/// - Database connection pool for user/API key storage
+/// - JWT validation configuration
+/// - External auth provider client (Clerk/Auth0)
+///
+/// TODO: Implement `AuthServiceTrait` when infrastructure is ready
 #[derive(Default)]
 pub struct AuthService {
-    // In a real implementation, this would contain:
-    // - Database connection pool
-    // - JWT validation config
-    // - External auth provider client (Clerk/Auth0)
     _private: (),
 }
 

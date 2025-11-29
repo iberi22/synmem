@@ -119,12 +119,16 @@ pub struct BrowserPoolStats {
 }
 
 /// Default implementation of the browser pool service
+///
+/// # Note
+/// This is a placeholder implementation. The actual implementation will need:
+/// - Container orchestration client (Docker/K8s)
+/// - Session state storage
+/// - Health monitoring
+///
+/// TODO: Implement `BrowserPoolServiceTrait` when infrastructure is ready
 #[derive(Default)]
 pub struct BrowserPoolService {
-    // In a real implementation, this would contain:
-    // - Container orchestration client (Docker/K8s)
-    // - Session state storage
-    // - Health monitoring
     _private: (),
 }
 

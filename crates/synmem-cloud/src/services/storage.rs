@@ -136,12 +136,16 @@ impl StorageUsage {
 }
 
 /// Default implementation of the storage service
+///
+/// # Note
+/// This is a placeholder implementation. The actual implementation will need:
+/// - Database connection pool (SQLite/Postgres)
+/// - Object storage client (S3/GCS)
+/// - Encryption service
+///
+/// TODO: Implement `StorageServiceTrait` when infrastructure is ready
 #[derive(Default)]
 pub struct StorageService {
-    // In a real implementation, this would contain:
-    // - Database connection pool (SQLite/Postgres)
-    // - Object storage client (S3/GCS)
-    // - Encryption service
     _private: (),
 }
 
