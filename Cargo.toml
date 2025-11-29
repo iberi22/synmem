@@ -1,0 +1,34 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/synmem-core",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["SynMem Contributors"]
+license = "Apache-2.0"
+repository = "https://github.com/iberi22/synmem"
+rust-version = "1.70"
+
+[workspace.dependencies]
+# Core dependencies
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+tracing = "0.1"
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+base64 = "0.21"
+
+# Security dependencies
+ring = "0.17"
+argon2 = "0.5"
+zeroize = { version = "1", features = ["derive"] }
+
+# Testing
+tokio-test = "0.4"
+tempfile = "3"
