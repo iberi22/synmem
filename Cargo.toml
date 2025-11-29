@@ -1,0 +1,40 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/synmem-core",
+    "crates/synmem-storage",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/iberi22/synmem"
+rust-version = "1.75"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Parallelization
+rayon = "1"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Tracing
+tracing = "0.1"
+
+# Async traits
+async-trait = "0.1"
+
+# Error handling
+thiserror = "1"
+anyhow = "1"
+
+# Embeddings (requires ONNX runtime - download at build time)
+fastembed = "3"
+
+# Internal crates
+synmem-core = { path = "crates/synmem-core" }
