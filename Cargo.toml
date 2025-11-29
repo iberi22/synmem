@@ -1,0 +1,44 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/synmem-core",
+    "crates/synmem-browser",
+    "crates/synmem-storage",
+    "crates/synmem-mcp",
+    "crates/synmem-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["SynMem Team"]
+license = "Apache-2.0"
+repository = "https://github.com/iberi22/synmem"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Parallelization
+rayon = "1"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Observability
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Async traits
+async-trait = "0.1"
+
+# Error handling
+thiserror = "1"
+anyhow = "1"
+
+# Internal crates
+synmem-core = { path = "crates/synmem-core" }
+synmem-browser = { path = "crates/synmem-browser" }
+synmem-storage = { path = "crates/synmem-storage" }
+synmem-mcp = { path = "crates/synmem-mcp" }
