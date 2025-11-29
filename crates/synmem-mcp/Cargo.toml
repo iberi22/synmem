@@ -1,0 +1,17 @@
+[package]
+name = "synmem-mcp"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "MCP Server tools for SynMem browser automation"
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tokio-test = "0.4"
