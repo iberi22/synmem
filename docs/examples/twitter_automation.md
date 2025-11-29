@@ -602,6 +602,6 @@ After posting, verify the tweet was created:
 
 ## Next Steps
 
-- [Chat Capture](chat_capture.md) - Capture AI conversations
 - [Basic Scraping](basic_scraping.md) - General web scraping
+- [Chat Capture](chat_capture.md) - Capture AI conversations
 - [MCP Tools Reference](../MCP_TOOLS.md) - Complete tool documentation

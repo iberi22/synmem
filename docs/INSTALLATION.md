@@ -179,7 +179,7 @@ source ~/.zshrc
 
 ### Windows
 
-Edit `%APPDATA%\Claude\config.json`:
+Edit `%APPDATA%\Claude\config.json` (typically `C:\Users\<username>\AppData\Roaming\Claude\config.json`):
 
 ```json
 {

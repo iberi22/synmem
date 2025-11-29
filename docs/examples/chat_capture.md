@@ -531,5 +531,5 @@ All captured data is stored locally:
 ## Next Steps
 
 - [Basic Scraping](basic_scraping.md) - General web scraping
-- [Twitter Automation](twitter_automation.md) - Social media automation
+- [Twitter Automation](twitter_automation.md) - Automate Twitter interactions
 - [MCP Tools Reference](../MCP_TOOLS.md) - Complete tool documentation

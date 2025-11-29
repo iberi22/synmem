@@ -510,8 +510,9 @@ impl FormatEvent for RedactingFormatter {
 If you discover a security vulnerability:
 
 1. **Do not** open a public issue
-2. Email: security@synmem.dev
-3. Include:
+2. Use [GitHub Security Advisories](https://github.com/iberi22/synmem/security/advisories/new) to report privately
+3. Alternatively, contact the maintainer via GitHub
+4. Include:
    - Description of the vulnerability
    - Steps to reproduce
    - Potential impact
