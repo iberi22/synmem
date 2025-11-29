@@ -157,10 +157,9 @@ where
             .await?
             .ok_or_else(|| SubscriptionError::CustomerNotFound(customer_id.to_string()))?;
 
-        let _stripe_customer_id = customer.stripe_customer_id.ok_or_else(|| {
-            SubscriptionError::InvalidOperation(
-                "Customer has no Stripe account".to_string(),
-            )
+        // Validate customer has a Stripe account before creating portal session
+        customer.stripe_customer_id.as_ref().ok_or_else(|| {
+            SubscriptionError::InvalidOperation("Customer has no Stripe account".to_string())
         })?;
 
         let request = CreatePortalRequest {
@@ -339,28 +338,48 @@ where
     S: SubscriptionStoragePort,
 {
     async fn handle_checkout_completed(&self, data: &serde_json::Value) -> Result<()> {
-        // Extract customer info from webhook data
-        // In production, parse Stripe webhook data structure
+        // TODO: Parse Stripe checkout.session.completed event and:
+        // 1. Extract customer email and subscription details from data.object
+        // 2. Find or create customer in storage
+        // 3. Create/update subscription with tier from line_items
+        // 4. Record SubscriptionEventType::Created event
         debug!("Checkout completed: {:?}", data);
         Ok(())
     }
 
     async fn handle_subscription_updated(&self, data: &serde_json::Value) -> Result<()> {
+        // TODO: Parse Stripe customer.subscription.updated event and:
+        // 1. Extract subscription ID and new status from data.object
+        // 2. Update subscription in storage with new status/period
+        // 3. Record appropriate event (Upgraded/Downgraded/Renewed)
         debug!("Subscription updated: {:?}", data);
         Ok(())
     }
 
     async fn handle_subscription_deleted(&self, data: &serde_json::Value) -> Result<()> {
+        // TODO: Parse Stripe customer.subscription.deleted event and:
+        // 1. Extract subscription ID from data.object
+        // 2. Mark subscription as Canceled/Expired in storage
+        // 3. Record SubscriptionEventType::Canceled event
         debug!("Subscription deleted: {:?}", data);
         Ok(())
     }
 
     async fn handle_payment_failed(&self, data: &serde_json::Value) -> Result<()> {
+        // TODO: Parse Stripe invoice.payment_failed event and:
+        // 1. Extract customer and subscription info from data.object
+        // 2. Update subscription status to PastDue
+        // 3. Record SubscriptionEventType::PaymentFailed event
+        // 4. Optionally trigger notification to customer
         warn!("Payment failed: {:?}", data);
         Ok(())
     }
 
     async fn handle_payment_succeeded(&self, data: &serde_json::Value) -> Result<()> {
+        // TODO: Parse Stripe invoice.payment_succeeded event and:
+        // 1. Extract customer and subscription info from data.object
+        // 2. Update subscription status to Active if was PastDue
+        // 3. Record SubscriptionEventType::PaymentSucceeded event
         debug!("Payment succeeded: {:?}", data);
         Ok(())
     }
