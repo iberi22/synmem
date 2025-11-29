@@ -7,7 +7,13 @@ mod embedding;
 mod session_persistence;
 mod storage;
 
-pub use browser_driver::BrowserDriverPort;
-pub use embedding::EmbeddingPort;
-pub use session_persistence::SessionPersistencePort;
-pub use storage::StoragePort;
+pub use browser_driver::{
+    BrowserDriverError, BrowserDriverPort, BrowserDriverResult, LaunchOptions, PageInfo, Viewport,
+    WaitOptions,
+};
+pub use embedding::{Embedding, EmbeddingError, EmbeddingPort, EmbeddingResult, ModelInfo};
+pub use session_persistence::{
+    Cookie, LocalStorageEntry, SameSite, SessionPersistenceError, SessionPersistencePort,
+    SessionPersistenceResult, SessionState,
+};
+pub use storage::{QueryFilter, StorageError, StoragePort, StorageResult, StoredRecord};
