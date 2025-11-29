@@ -1,0 +1,24 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/synmem-subscription",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+repository = "https://github.com/iberi22/synmem"
+
+[workspace.dependencies]
+tokio = { version = "1.41", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+async-trait = "0.1"
+tracing = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.11", features = ["v4", "serde"] }
+ed25519-dalek = { version = "2.1", features = ["rand_core", "serde"] }
+rand = "0.8"
+base64 = "0.22"
