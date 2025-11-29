@@ -618,4 +618,27 @@ mod types_tests {
         assert_eq!(deserialized.text, tweet.text);
         assert_eq!(deserialized.likes, tweet.likes);
     }
+
+    #[test]
+    fn test_twitter_session_debug_redacts_sensitive_data() {
+        let session = TwitterSession {
+            cookies: "super_secret_cookie".to_string(),
+            csrf_token: "secret_csrf_token".to_string(),
+            bearer_token: "secret_bearer_token".to_string(),
+            user_id: Some("123456".to_string()),
+        };
+
+        let debug_output = format!("{:?}", session);
+
+        // Ensure sensitive data is redacted
+        assert!(!debug_output.contains("super_secret_cookie"));
+        assert!(!debug_output.contains("secret_csrf_token"));
+        assert!(!debug_output.contains("secret_bearer_token"));
+
+        // Ensure user_id is still visible (not sensitive)
+        assert!(debug_output.contains("123456"));
+
+        // Ensure REDACTED placeholder is present
+        assert!(debug_output.contains("[REDACTED]"));
+    }
 }

@@ -45,7 +45,9 @@ pub async fn twitter_get_timeline(
     validate_session(session)?;
 
     // Build the timeline URL based on type
-    let _timeline_url = build_timeline_url(&input)?;
+    // TODO: This URL will be used by the browser driver for actual navigation
+    #[allow(unused_variables)]
+    let timeline_url = build_timeline_url(&input)?;
 
     // In a real implementation, this would:
     // 1. Navigate to the timeline URL

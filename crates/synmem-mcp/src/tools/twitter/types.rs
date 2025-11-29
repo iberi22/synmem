@@ -186,7 +186,10 @@ pub struct TwitterGetTimelineResult {
 }
 
 /// Twitter session information
-#[derive(Debug, Clone)]
+///
+/// Contains sensitive authentication data. The Debug implementation
+/// redacts sensitive fields to prevent accidental logging of credentials.
+#[derive(Clone)]
 pub struct TwitterSession {
     /// Session cookies
     pub cookies: String,
@@ -196,4 +199,15 @@ pub struct TwitterSession {
     pub bearer_token: String,
     /// Authenticated user ID
     pub user_id: Option<String>,
+}
+
+impl std::fmt::Debug for TwitterSession {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TwitterSession")
+            .field("cookies", &"[REDACTED]")
+            .field("csrf_token", &"[REDACTED]")
+            .field("bearer_token", &"[REDACTED]")
+            .field("user_id", &self.user_id)
+            .finish()
+    }
 }

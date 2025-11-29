@@ -93,16 +93,25 @@ impl RateLimiter {
         // Check and refill tokens if window has passed
         self.refill_if_needed().await;
 
-        // Try to consume a token
-        let tokens = self.tokens.load(Ordering::SeqCst);
-        if tokens == 0 {
-            let window_start = self.window_start.lock().await;
-            let elapsed = window_start.elapsed().as_secs();
-            let wait_seconds = self.config.window_seconds.saturating_sub(elapsed);
-            return Err(TwitterError::RateLimited { wait_seconds });
-        }
+        // Try to consume a token using compare-and-swap for thread safety
+        loop {
+            let current = self.tokens.load(Ordering::SeqCst);
+            if current == 0 {
+                let window_start = self.window_start.lock().await;
+                let elapsed = window_start.elapsed().as_secs();
+                let wait_seconds = self.config.window_seconds.saturating_sub(elapsed);
+                return Err(TwitterError::RateLimited { wait_seconds });
+            }
 
-        self.tokens.fetch_sub(1, Ordering::SeqCst);
+            // Atomically try to decrement the token count
+            match self
+                .tokens
+                .compare_exchange(current, current - 1, Ordering::SeqCst, Ordering::SeqCst)
+            {
+                Ok(_) => break,
+                Err(_) => continue, // Another thread modified it, retry
+            }
+        }
 
         // Enforce minimum delay between requests
         let mut last_request = self.last_request.lock().await;

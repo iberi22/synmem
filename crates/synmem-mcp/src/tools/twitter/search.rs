@@ -44,7 +44,9 @@ pub async fn twitter_search(
     validate_session(session)?;
 
     // Build the search URL based on filter
-    let _search_url = build_search_url(&input.query, &input.filter);
+    // TODO: This URL will be used by the browser driver for actual search
+    #[allow(unused_variables)]
+    let search_url = build_search_url(&input.query, &input.filter);
 
     // In a real implementation, this would:
     // 1. Navigate to the search URL
@@ -104,6 +106,7 @@ fn build_search_url(query: &str, filter: &SearchFilter) -> String {
 /// Simple URL encoding for the search query
 fn urlencoding(s: &str) -> String {
     let mut result = String::with_capacity(s.len() * 3);
+    let mut buffer = [0u8; 4];
     for c in s.chars() {
         match c {
             'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' | '.' | '~' => {
@@ -113,7 +116,8 @@ fn urlencoding(s: &str) -> String {
                 result.push_str("%20");
             }
             _ => {
-                for byte in c.to_string().as_bytes() {
+                let encoded = c.encode_utf8(&mut buffer);
+                for byte in encoded.as_bytes() {
                     result.push_str(&format!("%{:02X}", byte));
                 }
             }
