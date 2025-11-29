@@ -1,0 +1,48 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/synmem-core",
+    "crates/synmem-storage",
+    "crates/synmem-mcp",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["SynMem Contributors"]
+license = "MIT"
+repository = "https://github.com/iberi22/synmem"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.42", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# SQLite storage
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# MCP server
+rmcp = { version = "0.9", features = ["server", "transport-io", "macros"] }
+
+# Async trait
+async-trait = "0.1"
+
+# Logging/Tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# UUID
+uuid = { version = "1.11", features = ["v4", "serde"] }
+
+# DateTime
+chrono = { version = "0.4", features = ["serde"] }
+
+# Testing
+tokio-test = "0.4"
