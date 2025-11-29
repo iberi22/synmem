@@ -297,15 +297,24 @@ export class TwitterScraper implements Scraper {
     });
 
     // Video thumbnails (when video hasn't loaded)
+    // Note: These are skipped when we've already extracted the video element above
+    // to avoid duplicate entries. We only add them if they provide new information.
     const videoThumbs = element.querySelectorAll('[data-testid="videoPlayer"] img');
     videoThumbs.forEach(thumb => {
-      const src = thumb.getAttribute('src');
-      if (src) {
-        media.push({
-          type: 'video',
-          url: '', // Video URL not available without interaction
-          thumbnailUrl: src,
-        });
+      const thumbnailUrl = thumb.getAttribute('src');
+      if (thumbnailUrl) {
+        // Check if we already have this thumbnail from a video element
+        const alreadyExists = media.some(m => 
+          m.type === 'video' && m.thumbnailUrl === thumbnailUrl
+        );
+        if (!alreadyExists) {
+          // Only add if we have a thumbnail - skip entries with no URL
+          media.push({
+            type: 'video',
+            url: thumbnailUrl, // Use thumbnail as URL placeholder
+            thumbnailUrl,
+          });
+        }
       }
     });
 

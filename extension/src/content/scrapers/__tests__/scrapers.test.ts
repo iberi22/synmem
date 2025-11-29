@@ -353,6 +353,16 @@ describe('ClaudeScraper', () => {
     const result = scraper.extract(dom.window.document);
 
     expect(result.chatMessages).toBeDefined();
+    // Should have 2 messages: thinking and main response
+    expect(result.chatMessages?.length).toBe(2);
+    // First message should be thinking
+    const thinkingMsg = result.chatMessages?.find(m => m.role === 'thinking');
+    expect(thinkingMsg).toBeDefined();
+    expect(thinkingMsg?.content).toContain('Let me think');
+    // Second message should be the response
+    const responseMsg = result.chatMessages?.find(m => m.role === 'assistant');
+    expect(responseMsg).toBeDefined();
+    expect(responseMsg?.content).toContain('Here is my response');
   });
 });
 

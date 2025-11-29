@@ -91,10 +91,8 @@ export class ClaudeScraper implements Scraper {
 
     if (messageElements && messageElements.length > 0) {
       messageElements.forEach(element => {
-        const message = this.extractMessageFromElement(element);
-        if (message) {
-          messages.push(message);
-        }
+        const extractedMessages = this.extractMessagesFromElement(element);
+        messages.push(...extractedMessages);
       });
     } else {
       // Fallback: try container-based extraction
@@ -104,32 +102,34 @@ export class ClaudeScraper implements Scraper {
     return messages;
   }
 
-  /** Extract a single message from an element */
-  private extractMessageFromElement(element: Element): ChatMessage | null {
+  /** Extract messages from an element (may return multiple for thinking + response) */
+  private extractMessagesFromElement(element: Element): ChatMessage[] {
+    const messages: ChatMessage[] = [];
     const role = this.detectRole(element);
     
     // Check for thinking process first
     const thinking = this.extractThinking(element);
     
-    const content = this.extractContent(element);
-    
-    if (!content && !thinking) return null;
-
-    const codeBlocks = this.extractCodeBlocksFromElement(element);
-
-    // If this is thinking content, create a separate message
+    // If this is thinking content from assistant, add as separate message
     if (thinking && role === 'assistant') {
-      return {
+      messages.push({
         role: 'thinking',
         content: thinking,
-      };
+      });
     }
-
-    return {
-      role,
-      content,
-      codeBlocks: codeBlocks.length > 0 ? codeBlocks : undefined,
-    };
+    
+    const content = this.extractContent(element);
+    
+    if (content) {
+      const codeBlocks = this.extractCodeBlocksFromElement(element);
+      messages.push({
+        role,
+        content,
+        codeBlocks: codeBlocks.length > 0 ? codeBlocks : undefined,
+      });
+    }
+    
+    return messages;
   }
 
   /** Detect the role from element attributes */
