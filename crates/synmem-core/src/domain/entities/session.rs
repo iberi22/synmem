@@ -115,9 +115,9 @@ impl Session {
         &mut self.cookies
     }
 
-    /// Find a cookie by name and domain
+    /// Find a cookie by name and domain (exact domain match for security)
     pub fn find_cookie(&self, name: &str, domain: &str) -> Option<&Cookie> {
-        self.cookies.iter().find(|c| c.name == name && c.domain.contains(domain))
+        self.cookies.iter().find(|c| c.name == name && c.domain == domain)
     }
 
     /// Remove expired cookies
@@ -204,9 +204,14 @@ mod tests {
         let cookies = vec![create_test_cookie()];
         let session = Session::new(profile, cookies);
 
-        let found = session.find_cookie("session_id", "example.com");
+        // Exact domain match required
+        let found = session.find_cookie("session_id", ".example.com");
         assert!(found.is_some());
         assert_eq!(found.unwrap().value, "secret_value_12345");
+        
+        // Non-matching domain should return None
+        let not_found = session.find_cookie("session_id", "example.com");
+        assert!(not_found.is_none());
     }
 
     #[test]

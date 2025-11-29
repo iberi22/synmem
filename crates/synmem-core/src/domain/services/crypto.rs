@@ -61,7 +61,7 @@ impl MasterKey {
         
         // Extract the hash output
         let hash_output = hash.hash
-            .ok_or_else(|| CryptoError::KeyDerivationError("No hash output".to_string()))?;
+            .ok_or_else(|| CryptoError::KeyDerivationError("Failed to extract hash from Argon2 output".to_string()))?;
         
         let hash_bytes = hash_output.as_bytes();
         

@@ -192,7 +192,17 @@ impl SessionManager {
 
     /// Save a session profile to storage
     pub fn save_session(&self, profile: &SessionProfile) -> Result<(), SessionError> {
-        let mut storage = self.load_storage().unwrap_or_default();
+        let mut storage = match self.load_storage() {
+            Ok(s) => s,
+            Err(SessionError::IoError(e)) if e.kind() == std::io::ErrorKind::NotFound => {
+                // File doesn't exist yet, create new storage
+                SessionStorage::default()
+            }
+            Err(e) => {
+                tracing::warn!("Failed to load existing session storage, creating new: {}", e);
+                SessionStorage::default()
+            }
+        };
         storage.profiles.insert(profile.profile.clone(), profile.clone());
         self.save_storage(&storage)
     }
@@ -282,8 +292,9 @@ impl SessionManager {
                 if session.profile.needs_refresh() {
                     match self.refresh_session(&profile_name, master_password) {
                         Ok(_) => refreshed.push(profile_name),
-                        Err(e) => {
-                            tracing::warn!("Failed to refresh session {}: {}", profile_name, e);
+                        Err(_) => {
+                            // Log only a generic message to avoid leaking sensitive information
+                            tracing::warn!("Failed to refresh session: {}", profile_name);
                         }
                     }
                 }
