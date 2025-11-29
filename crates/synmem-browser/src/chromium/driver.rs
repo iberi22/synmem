@@ -226,6 +226,10 @@ impl BrowserDriverPort for ChromiumDriver {
         info!(selector = %selector, value = %value, "Selecting option");
         let page = self.get_or_create_page().await?;
 
+        // Properly escape strings for JavaScript to prevent injection
+        let escaped_selector = escape_js_string(selector);
+        let escaped_value = escape_js_string(value);
+
         // Use JavaScript to select the option
         let script = format!(
             r#"
@@ -236,8 +240,8 @@ impl BrowserDriverPort for ChromiumDriver {
                 select.dispatchEvent(new Event('change', {{ bubbles: true }}));
             }})()
             "#,
-            selector.replace('\'', "\\'"),
-            value.replace('\'', "\\'")
+            escaped_selector,
+            escaped_value
         );
 
         page.evaluate(script)
@@ -427,20 +431,24 @@ impl BrowserDriverPort for ChromiumDriver {
 
         // Restore local storage
         for entry in &session.local_storage {
+            let escaped_key = escape_js_string(&entry.key);
+            let escaped_value = escape_js_string(&entry.value);
             let script = format!(
                 "localStorage.setItem('{}', '{}')",
-                entry.key.replace('\'', "\\'"),
-                entry.value.replace('\'', "\\'")
+                escaped_key,
+                escaped_value
             );
             let _ = page.evaluate(script).await;
         }
 
         // Restore session storage
         for entry in &session.session_storage {
+            let escaped_key = escape_js_string(&entry.key);
+            let escaped_value = escape_js_string(&entry.value);
             let script = format!(
                 "sessionStorage.setItem('{}', '{}')",
-                entry.key.replace('\'', "\\'"),
-                entry.value.replace('\'', "\\'")
+                escaped_key,
+                escaped_value
             );
             let _ = page.evaluate(script).await;
         }
@@ -497,6 +505,35 @@ fn uuid_v4() -> String {
     format!("{:032x}", timestamp)
 }
 
+/// Escape a string for safe use in JavaScript string literals.
+/// This prevents XSS attacks by properly escaping control characters,
+/// quotes, backslashes, and other potentially dangerous characters.
+fn escape_js_string(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '\\' => result.push_str("\\\\"),
+            '\'' => result.push_str("\\'"),
+            '"' => result.push_str("\\\""),
+            '\n' => result.push_str("\\n"),
+            '\r' => result.push_str("\\r"),
+            '\t' => result.push_str("\\t"),
+            '\x08' => result.push_str("\\b"),
+            '\x0C' => result.push_str("\\f"),
+            '<' => result.push_str("\\u003c"),
+            '>' => result.push_str("\\u003e"),
+            '/' => result.push_str("\\/"),
+            '\u{2028}' => result.push_str("\\u2028"),
+            '\u{2029}' => result.push_str("\\u2029"),
+            c if c.is_control() => {
+                result.push_str(&format!("\\u{:04x}", c as u32));
+            }
+            _ => result.push(c),
+        }
+    }
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -507,5 +544,26 @@ mod tests {
         let id2 = uuid_v4();
         assert_ne!(id1, id2);
         assert_eq!(id1.len(), 32);
+    }
+
+    #[test]
+    fn test_escape_js_string() {
+        // Test basic escaping
+        assert_eq!(escape_js_string("hello"), "hello");
+        assert_eq!(escape_js_string("it's"), "it\\'s");
+        assert_eq!(escape_js_string("say \"hello\""), "say \\\"hello\\\"");
+        assert_eq!(escape_js_string("back\\slash"), "back\\\\slash");
+        
+        // Test control characters
+        assert_eq!(escape_js_string("line\nbreak"), "line\\nbreak");
+        assert_eq!(escape_js_string("tab\there"), "tab\\there");
+        
+        // Test XSS prevention
+        assert_eq!(escape_js_string("<script>"), "\\u003cscript\\u003e");
+        assert_eq!(escape_js_string("</script>"), "\\u003c\\/script\\u003e");
+        
+        // Test Unicode line separators
+        assert_eq!(escape_js_string("test\u{2028}sep"), "test\\u2028sep");
+        assert_eq!(escape_js_string("test\u{2029}sep"), "test\\u2029sep");
     }
 }
