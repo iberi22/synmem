@@ -1,0 +1,38 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/synmem-core",
+    "crates/synmem-mcp",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+repository = "https://github.com/iberi22/synmem"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Async traits
+async-trait = "0.1"
+
+# Testing
+tokio-test = "0.4"
+
+# Internal crates
+synmem-core = { path = "crates/synmem-core" }
+
+[profile.release]
+lto = true
+codegen-units = 1

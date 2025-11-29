@@ -1,0 +1,19 @@
+[package]
+name = "synmem-mcp"
+version.workspace = true
+edition = "2024"
+rust-version = "1.85"
+license.workspace = true
+description = "MCP Server tools for SynMem - Semantic Memory Search"
+
+[dependencies]
+synmem-core = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio-test = { workspace = true }
