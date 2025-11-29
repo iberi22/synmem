@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SynMem</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>🧠 SynMem</h1>
+      <p class="subtitle">Synthetic Memory Browser Agent</p>
+    </header>
+    
+    <main class="main">
+      <section class="status-section">
+        <div class="status-indicator" id="status-indicator">
+          <span class="status-dot"></span>
+          <span class="status-text" id="status-text">Checking connection...</span>
+        </div>
+      </section>
+      
+      <section class="actions-section">
+        <button class="btn btn-primary" id="btn-connect">
+          Connect to Host
+        </button>
+        <button class="btn btn-secondary" id="btn-scrape">
+          Scrape Page
+        </button>
+      </section>
+      
+      <section class="info-section">
+        <div class="info-card">
+          <h3>Current Page</h3>
+          <p id="current-page">Loading...</p>
+        </div>
+      </section>
+    </main>
+    
+    <footer class="footer">
+      <p>v0.1.0</p>
+    </footer>
+  </div>
+  <script type="module" src="./index.js"></script>
+</body>
+</html>

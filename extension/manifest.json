@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "SynMem - Synthetic Memory Browser Agent",
+  "version": "0.1.0",
+  "description": "Capture, navigate, and automate the web with your authenticated session, exposing everything via MCP.",
+  "permissions": [
+    "nativeMessaging",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://gemini.google.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://x.com/*",
+    "https://twitter.com/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": ["content/index.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_title": "SynMem"
+  }
+}
