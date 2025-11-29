@@ -1,0 +1,23 @@
+[package]
+name = "synmem-storage"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Storage adapters for SynMem including embeddings"
+
+[features]
+default = []
+# Enable fastembed for local embedding generation (requires ONNX runtime download)
+fastembed = ["dep:fastembed"]
+
+[dependencies]
+synmem-core.workspace = true
+rayon.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+fastembed = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
