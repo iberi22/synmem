@@ -91,7 +91,7 @@ impl Macro {
                         amount: last_amount,
                     }),
                 ) if direction == last_dir => {
-                    *last_amount += amount;
+                    *last_amount = last_amount.saturating_add(*amount);
                 }
                 // Keep all other actions
                 _ => {

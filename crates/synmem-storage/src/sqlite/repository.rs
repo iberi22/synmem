@@ -1,9 +1,14 @@
 //! SQLite repository for macros
 //!
 //! Implements the MacroStorage port using SQLite.
+//!
+//! Note: We use `std::sync::Mutex` here instead of `tokio::sync::Mutex` because
+//! rusqlite operations are synchronous and fast (local SQLite). Using tokio's
+//! async mutex would provide no benefit since we're not holding the lock across
+//! await points - all SQLite operations complete quickly within a single call.
 
 use async_trait::async_trait;
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, Utc};
 use rusqlite::{params, Connection};
 use std::path::Path;
 use std::sync::Mutex;
@@ -69,9 +74,7 @@ impl MacroRepository {
 
     /// Convert a Unix timestamp to DateTime<Utc>
     fn timestamp_to_datetime(timestamp: i64) -> DateTime<Utc> {
-        Utc.timestamp_opt(timestamp, 0)
-            .single()
-            .unwrap_or_else(Utc::now)
+        DateTime::from_timestamp(timestamp, 0).unwrap_or_else(Utc::now)
     }
 }
 
