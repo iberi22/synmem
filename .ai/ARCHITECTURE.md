@@ -189,6 +189,18 @@ synmem/
 │   │   │   └── lib.rs
 │   │   └── Cargo.toml
 │   │
+│   ├── synmem-marketplace/       # Scraper Marketplace (Phase 6.3)
+│   │   ├── src/
+│   │   │   ├── domain/
+│   │   │   │   ├── entities/     # Package, Review, Install, Payout
+│   │   │   │   └── services/     # Marketplace, Review, Payout services
+│   │   │   ├── ports/
+│   │   │   │   ├── inbound/      # Commands & Queries
+│   │   │   │   └── outbound/     # Repository & Gateway
+│   │   │   ├── schema/           # JSON validation
+│   │   │   └── lib.rs
+│   │   └── Cargo.toml
+│   │
 │   ├── synmem-mcp/               # MCP Server Adapter
 │   │   ├── src/
 │   │   │   ├── server.rs
@@ -330,8 +342,75 @@ synmem/
 ### Phase 6: Monetization (Post-launch)
 - [ ] SynMem Cloud infrastructure
 - [ ] Subscription system
-- [ ] Scraper marketplace
+- [x] Scraper marketplace (Phase 6.3 - Foundation implemented)
 - [ ] Enterprise features
+
+---
+
+## 🏪 Scraper Marketplace (Phase 6.3)
+
+### Overview
+Community marketplace for site-specific scrapers with revenue sharing.
+
+### Revenue Model
+- **Free scrapers**: Community contributed
+- **Paid scrapers**: 70% to creator, 30% to SynMem platform
+
+### Package Format
+```json
+{
+  "name": "linkedin-profile-scraper",
+  "version": "1.0.0",
+  "author": "username",
+  "price": 5.00,
+  "sites": ["linkedin.com"],
+  "description": "Extract profile data from LinkedIn",
+  "schema": {
+    "output": {
+      "name": { "type": "string", "required": true },
+      "headline": { "type": "string" },
+      "experience": { "type": "array" }
+    }
+  }
+}
+```
+
+### Marketplace Features
+- [x] Scraper package format (ScraperPackage entity)
+- [x] JSON schema validation
+- [x] Review & rating system
+- [x] Install tracking
+- [x] Payout system (70/30 split)
+- [ ] Scraper submission UI
+- [ ] Review/approval workflow (admin)
+- [ ] Payment gateway integration
+
+### Architecture (synmem-marketplace crate)
+```
+crates/synmem-marketplace/
+├── src/
+│   ├── domain/
+│   │   ├── entities/
+│   │   │   ├── package.rs       # ScraperPackage, PricingModel
+│   │   │   ├── review.rs        # Review, Rating
+│   │   │   ├── install.rs       # InstallRecord
+│   │   │   ├── payout.rs        # PayoutRecord, PayoutStatus
+│   │   │   └── schema_def.rs    # SchemaDefinition
+│   │   └── services/
+│   │       ├── marketplace.rs   # MarketplaceService
+│   │       ├── review.rs        # ReviewService
+│   │       └── payout.rs        # PayoutService
+│   ├── ports/
+│   │   ├── inbound/             # MarketplaceCommands, MarketplaceQueries
+│   │   └── outbound/            # ScraperRepository, PayoutGateway
+│   └── schema/                  # JSON validation
+```
+
+### Example Scrapers
+- **linkedin-profile-scraper**: Extract profile data
+- **amazon-product-scraper**: Extract product info
+- **reddit-thread-scraper**: Extract thread content
+- **twitter-thread-scraper**: Extract tweet threads
 
 ---
 

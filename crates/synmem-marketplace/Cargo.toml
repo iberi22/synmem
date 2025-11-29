@@ -1,0 +1,20 @@
+[package]
+name = "synmem-marketplace"
+version = "0.1.0"
+edition = "2021"
+description = "Scraper marketplace for SynMem - Community scrapers with revenue sharing"
+license = "MIT"
+authors = ["SynMem Contributors"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+url = { version = "2", features = ["serde"] }
+semver = { version = "1", features = ["serde"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
