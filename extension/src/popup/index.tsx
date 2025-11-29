@@ -10,6 +10,9 @@
 // Make this file a module to avoid global scope conflicts
 export {};
 
+/** Maximum length for pathname display in UI */
+const MAX_PATHNAME_DISPLAY_LENGTH = 30;
+
 interface StatusState {
   connected: boolean;
   message: string;
@@ -44,7 +47,7 @@ async function updateCurrentPage(): Promise<void> {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab?.url && elements.currentPage) {
       const url = new URL(tab.url);
-      elements.currentPage.textContent = url.hostname + url.pathname.slice(0, 30);
+      elements.currentPage.textContent = url.hostname + url.pathname.slice(0, MAX_PATHNAME_DISPLAY_LENGTH);
     }
   } catch (error) {
     console.error('[SynMem Popup] Failed to get current tab:', error);

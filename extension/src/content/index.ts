@@ -11,6 +11,9 @@
 // Make this file a module to avoid global scope conflicts
 export {};
 
+/** Maximum content size in characters for extracted page content */
+const MAX_CONTENT_SIZE = 50000;
+
 /**
  * Message types for communication
  */
@@ -52,13 +55,24 @@ function extractPageContent(): ExtractedContent {
   return {
     url,
     title,
-    content: content.trim().slice(0, 50000), // Limit content size
+    content: content.trim().slice(0, MAX_CONTENT_SIZE),
     timestamp: Date.now(),
     metadata: {
       domain: window.location.hostname,
       pathname: window.location.pathname,
     },
   };
+}
+
+/**
+ * Check if hostname matches or is a subdomain of the target domain
+ * Uses proper suffix checking to avoid security issues with substring matching
+ */
+function matchesHostname(hostname: string, target: string): boolean {
+  // Exact match
+  if (hostname === target) return true;
+  // Subdomain match (e.g., www.gemini.google.com matches gemini.google.com)
+  return hostname.endsWith('.' + target);
 }
 
 /**
@@ -73,7 +87,7 @@ function isSupportedChatSite(): boolean {
     'x.com',
     'twitter.com',
   ];
-  return supportedSites.some(site => hostname.includes(site));
+  return supportedSites.some(site => matchesHostname(hostname, site));
 }
 
 /**
@@ -82,10 +96,10 @@ function isSupportedChatSite(): boolean {
 function getSiteType(): string {
   const hostname = window.location.hostname;
   
-  if (hostname.includes('gemini.google.com')) return 'gemini';
-  if (hostname.includes('chat.openai.com')) return 'chatgpt';
-  if (hostname.includes('claude.ai')) return 'claude';
-  if (hostname.includes('x.com') || hostname.includes('twitter.com')) return 'twitter';
+  if (matchesHostname(hostname, 'gemini.google.com')) return 'gemini';
+  if (matchesHostname(hostname, 'chat.openai.com')) return 'chatgpt';
+  if (matchesHostname(hostname, 'claude.ai')) return 'claude';
+  if (matchesHostname(hostname, 'x.com') || matchesHostname(hostname, 'twitter.com')) return 'twitter';
   
   return 'unknown';
 }
