@@ -34,12 +34,70 @@ impl Default for FastEmbedConfig {
     }
 }
 
+/// Returns the dimensionality of embeddings for a given model.
+fn get_model_dimension(model: &EmbeddingModel) -> usize {
+    match model {
+        EmbeddingModel::AllMiniLML6V2 | EmbeddingModel::AllMiniLML6V2Q => 384,
+        EmbeddingModel::BGEBaseENV15 | EmbeddingModel::BGEBaseENV15Q => 768,
+        EmbeddingModel::BGESmallENV15 | EmbeddingModel::BGESmallENV15Q => 384,
+        EmbeddingModel::BGELargeENV15 | EmbeddingModel::BGELargeENV15Q => 1024,
+        EmbeddingModel::NomicEmbedTextV1 | EmbeddingModel::NomicEmbedTextV15 => 768,
+        EmbeddingModel::NomicEmbedTextV15Q => 768,
+        EmbeddingModel::ParaphraseMLMiniLML12V2 | EmbeddingModel::ParaphraseMLMiniLML12V2Q => 384,
+        EmbeddingModel::ParaphraseMLMpnetBaseV2 => 768,
+        EmbeddingModel::MultilingualE5Small => 384,
+        EmbeddingModel::MultilingualE5Base => 768,
+        EmbeddingModel::MultilingualE5Large => 1024,
+        EmbeddingModel::MxbaiEmbedLargeV1 | EmbeddingModel::MxbaiEmbedLargeV1Q => 1024,
+        EmbeddingModel::GTEBaseENV15 | EmbeddingModel::GTEBaseENV15Q => 768,
+        EmbeddingModel::GTELargeENV15 | EmbeddingModel::GTELargeENV15Q => 1024,
+        EmbeddingModel::JINABORUSSMALLENV1 => 512,
+        // Default fallback for any new models - most common dimension
+        _ => 384,
+    }
+}
+
+/// Returns the model name for a given model.
+fn get_model_name(model: &EmbeddingModel) -> &'static str {
+    match model {
+        EmbeddingModel::AllMiniLML6V2 => "all-MiniLM-L6-v2",
+        EmbeddingModel::AllMiniLML6V2Q => "all-MiniLM-L6-v2-quantized",
+        EmbeddingModel::BGEBaseENV15 => "bge-base-en-v1.5",
+        EmbeddingModel::BGEBaseENV15Q => "bge-base-en-v1.5-quantized",
+        EmbeddingModel::BGESmallENV15 => "bge-small-en-v1.5",
+        EmbeddingModel::BGESmallENV15Q => "bge-small-en-v1.5-quantized",
+        EmbeddingModel::BGELargeENV15 => "bge-large-en-v1.5",
+        EmbeddingModel::BGELargeENV15Q => "bge-large-en-v1.5-quantized",
+        EmbeddingModel::NomicEmbedTextV1 => "nomic-embed-text-v1",
+        EmbeddingModel::NomicEmbedTextV15 => "nomic-embed-text-v1.5",
+        EmbeddingModel::NomicEmbedTextV15Q => "nomic-embed-text-v1.5-quantized",
+        EmbeddingModel::ParaphraseMLMiniLML12V2 => "paraphrase-multilingual-MiniLM-L12-v2",
+        EmbeddingModel::ParaphraseMLMiniLML12V2Q => {
+            "paraphrase-multilingual-MiniLM-L12-v2-quantized"
+        }
+        EmbeddingModel::ParaphraseMLMpnetBaseV2 => "paraphrase-multilingual-mpnet-base-v2",
+        EmbeddingModel::MultilingualE5Small => "multilingual-e5-small",
+        EmbeddingModel::MultilingualE5Base => "multilingual-e5-base",
+        EmbeddingModel::MultilingualE5Large => "multilingual-e5-large",
+        EmbeddingModel::MxbaiEmbedLargeV1 => "mxbai-embed-large-v1",
+        EmbeddingModel::MxbaiEmbedLargeV1Q => "mxbai-embed-large-v1-quantized",
+        EmbeddingModel::GTEBaseENV15 => "gte-base-en-v1.5",
+        EmbeddingModel::GTEBaseENV15Q => "gte-base-en-v1.5-quantized",
+        EmbeddingModel::GTELargeENV15 => "gte-large-en-v1.5",
+        EmbeddingModel::GTELargeENV15Q => "gte-large-en-v1.5-quantized",
+        EmbeddingModel::JINABORUSSMALLENV1 => "jina-borus-small-en-v1",
+        // Default fallback for any new models
+        _ => "unknown-model",
+    }
+}
+
 /// FastEmbed adapter for local embedding generation.
 ///
 /// Uses the fastembed library with Rayon for parallel batch processing.
 pub struct FastEmbedAdapter {
     model: TextEmbedding,
     config: FastEmbedConfig,
+    dimension: usize,
 }
 
 impl FastEmbedAdapter {
@@ -57,7 +115,13 @@ impl FastEmbedAdapter {
             EmbeddingError::InitializationError(format!("Failed to initialize FastEmbed: {}", e))
         })?;
 
-        Ok(Self { model, config })
+        let dimension = get_model_dimension(&config.model);
+
+        Ok(Self {
+            model,
+            config,
+            dimension,
+        })
     }
 
     /// Creates a new FastEmbedAdapter with a specific model.
@@ -132,12 +196,23 @@ impl EmbeddingPort for FastEmbedAdapter {
         let all_embeddings: Vec<Vec<f32>> = batch_results?.into_iter().flatten().collect();
 
         // Reconstruct results preserving original order
-        let mut results = vec![Embedding::new(vec![]); texts.len()];
+        // Empty texts get a zero vector of the correct dimension
+        let zero_embedding = vec![0.0f32; self.dimension];
+        let mut results: Vec<Embedding> = texts
+            .iter()
+            .map(|t| {
+                if t.is_empty() {
+                    Embedding::new(zero_embedding.clone())
+                } else {
+                    Embedding::new(vec![]) // Placeholder, will be replaced
+                }
+            })
+            .collect();
+
         for ((original_idx, _), embedding_values) in non_empty.into_iter().zip(all_embeddings) {
             results[original_idx] = Embedding::new(embedding_values);
         }
 
-        // For empty texts, we'll leave them as empty embeddings
         Ok(results)
     }
 
@@ -173,16 +248,11 @@ impl EmbeddingPort for FastEmbedAdapter {
     }
 
     fn embedding_dimension(&self) -> usize {
-        // all-MiniLM-L6-v2 produces 384-dimensional embeddings
-        384
+        self.dimension
     }
 
     fn model_name(&self) -> &str {
-        match self.config.model {
-            EmbeddingModel::AllMiniLML6V2 => "all-MiniLM-L6-v2",
-            EmbeddingModel::AllMiniLML6V2Q => "all-MiniLM-L6-v2-quantized",
-            _ => "unknown",
-        }
+        get_model_name(&self.config.model)
     }
 }
 

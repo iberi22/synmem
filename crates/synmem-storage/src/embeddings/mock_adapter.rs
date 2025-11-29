@@ -74,7 +74,8 @@ impl EmbeddingPort for MockEmbedAdapter {
             return Ok(Vec::new());
         }
 
-        // Check if all texts are empty
+        // Check if all texts are empty - this is an error condition
+        // as there would be nothing meaningful to embed
         if texts.iter().all(|t| t.is_empty()) {
             return Err(EmbeddingError::InvalidInput(
                 "All texts are empty".to_string(),
@@ -82,6 +83,8 @@ impl EmbeddingPort for MockEmbedAdapter {
         }
 
         // Process in parallel using Rayon
+        // Empty texts within a mixed batch get a zero vector of the correct dimension
+        // This preserves index alignment with the input
         let embeddings: Vec<Embedding> = texts
             .par_iter()
             .map(|text| {
