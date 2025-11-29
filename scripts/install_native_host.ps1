@@ -38,15 +38,17 @@ if (-not $HostPath) {
     }
 }
 
-# Validate host executable exists
-if (-not (Test-Path $HostPath)) {
-    Write-Error "Native host executable not found at: $HostPath"
-    Write-Error "Please build the project first with: cargo build --release -p synmem-native-host"
-    exit 1
-}
+# Validate host executable exists (only when installing)
+if (-not $Uninstall) {
+    if (-not (Test-Path $HostPath)) {
+        Write-Error "Native host executable not found at: $HostPath"
+        Write-Error "Please build the project first with: cargo build --release -p synmem-native-host"
+        exit 1
+    }
 
-# Get absolute path
-$HostPath = (Resolve-Path $HostPath).Path
+    # Get absolute path
+    $HostPath = (Resolve-Path $HostPath).Path
+}
 
 Write-Host "🧠 SynMem Native Host Installer" -ForegroundColor Cyan
 Write-Host "================================" -ForegroundColor Cyan
