@@ -98,8 +98,6 @@ impl DomExtractor {
     /// Extracts all text content from the page body
     pub fn extract_text(&self, document: &Html) -> String {
         let body_selector = Selector::parse("body").ok();
-        let script_selector = Selector::parse("script").ok();
-        let style_selector = Selector::parse("style").ok();
 
         if let Some(selector) = body_selector {
             if let Some(body) = document.select(&selector).next() {
@@ -122,8 +120,6 @@ impl DomExtractor {
         }
 
         // Fallback to root text extraction
-        let _script = script_selector;
-        let _style = style_selector;
         document
             .root_element()
             .text()
