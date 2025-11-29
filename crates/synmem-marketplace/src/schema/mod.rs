@@ -78,16 +78,15 @@ impl ScraperPackageSubmission {
             ));
         }
 
-        // Validate version format (basic semver check)
+        // Validate version format using semver crate
         if self.version.is_empty() {
             return Err(SchemaValidationError::MissingField("version".to_string()));
         }
 
-        let version_parts: Vec<&str> = self.version.split('.').collect();
-        if version_parts.len() < 2 {
+        if semver::Version::parse(&self.version).is_err() {
             return Err(SchemaValidationError::InvalidFieldValue(
                 "version".to_string(),
-                "must be in semver format (e.g., 1.0.0)".to_string(),
+                "must be in valid semver format (e.g., 1.0.0)".to_string(),
             ));
         }
 
@@ -145,7 +144,12 @@ fn convert_schema_json(json: &SchemaDefinitionJson) -> SchemaResult<SchemaDefini
     })?;
 
     let output_map: std::collections::HashMap<String, crate::domain::entities::SchemaField> =
-        serde_json::from_str(&output_str).unwrap_or_default();
+        serde_json::from_str(&output_str).map_err(|e| {
+            SchemaValidationError::InvalidJson(format!(
+                "Failed to parse output schema: {}",
+                e
+            ))
+        })?;
 
     Ok(SchemaDefinition { output: output_map })
 }

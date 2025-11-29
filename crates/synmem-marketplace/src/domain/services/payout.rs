@@ -194,9 +194,10 @@ impl<R: ScraperRepository + Send + Sync, G: PayoutGateway + Send + Sync> PayoutS
         let mut results = Vec::new();
 
         for payout in pending {
-            match self.process_payout(payout.id).await {
-                Ok(processed) => results.push(processed),
-                Err(_) => continue, // Skip failed payouts
+            // Process each payout, collecting successful ones
+            // Failed payouts will remain in pending state for retry
+            if let Ok(processed) = self.process_payout(payout.id).await {
+                results.push(processed);
             }
         }
 

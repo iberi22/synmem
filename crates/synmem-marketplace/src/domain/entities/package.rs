@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use super::payout::PayoutRecord;
 use super::schema_def::SchemaDefinition;
 
 /// Pricing model for scraper packages.
@@ -179,12 +180,12 @@ impl ScraperPackage {
 
     /// Calculates creator payout for a purchase (70% revenue share).
     pub fn creator_payout(&self) -> Option<f64> {
-        self.price().map(|p| p * 0.70)
+        self.price().map(|p| p * PayoutRecord::CREATOR_SHARE)
     }
 
     /// Calculates platform fee for a purchase (30% revenue share).
     pub fn platform_fee(&self) -> Option<f64> {
-        self.price().map(|p| p * 0.30)
+        self.price().map(|p| p * PayoutRecord::PLATFORM_SHARE)
     }
 }
 

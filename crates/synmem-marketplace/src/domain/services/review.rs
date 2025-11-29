@@ -267,10 +267,20 @@ impl<R: ScraperRepository + Send + Sync> DefaultReviewService<R> {
         let avg = self.get_average_rating(package_id).await?;
         let reviews = self.list_package_reviews(package_id).await?;
 
-        if let Ok(Some(mut package)) = self.repository.get_by_id(package_id).await {
-            package.metadata.average_rating = avg;
-            package.metadata.review_count = reviews.len() as u64;
-            let _ = self.repository.save(&package).await;
+        // Get and update the package metadata
+        let package = self
+            .repository
+            .get_by_id(package_id)
+            .await
+            .map_err(|e| ReviewError::RepositoryError(e.to_string()))?;
+
+        if let Some(mut pkg) = package {
+            pkg.metadata.average_rating = avg;
+            pkg.metadata.review_count = reviews.len() as u64;
+            self.repository
+                .save(&pkg)
+                .await
+                .map_err(|e| ReviewError::RepositoryError(e.to_string()))?;
         }
 
         Ok(())

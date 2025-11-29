@@ -1,10 +1,10 @@
 //! Domain entities for the scraper marketplace.
 
 mod install;
-mod package;
 mod payout;
-mod review;
 mod schema_def;
+mod package;
+mod review;
 
 pub use install::InstallRecord;
 pub use package::{PricingModel, ScraperPackage, ScraperPackageMetadata, ScraperStatus};
