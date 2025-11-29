@@ -1,0 +1,18 @@
+[package]
+name = "synmem-mcp"
+version.workspace = true
+edition = "2024"
+
+[dependencies]
+synmem-core = { path = "../synmem-core" }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+tracing = { workspace = true }
+rmcp = { workspace = true }
+
+[dev-dependencies]
+mockall = { workspace = true }
+tokio = { workspace = true, features = ["test-util", "macros"] }
