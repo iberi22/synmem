@@ -143,7 +143,11 @@ where
 
     /// Deduplicate results based on content similarity
     ///
-    /// Uses simple character-level Jaccard similarity for efficiency
+    /// Uses simple character-level Jaccard similarity for efficiency.
+    ///
+    /// Note: This has O(n²) complexity where n is the number of results.
+    /// This is acceptable for typical search result sizes (10-50 items).
+    /// For larger result sets, consider using MinHash or SimHash algorithms.
     fn deduplicate(&self, results: Vec<SearchResult>) -> Vec<SearchResult> {
         if !self.config.dedup_enabled || results.is_empty() {
             return results;
