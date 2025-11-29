@@ -123,6 +123,17 @@
 | `fastembed` | Local embeddings (Rust native) |
 | `qdrant-client` | Vector DB client |
 
+### Cloud Infrastructure (synmem-cloud)
+| Crate | Purpose |
+|-------|---------|
+| `axum` | Web framework for REST API |
+| `tower` | Service middleware (rate limiting, CORS) |
+| `tower-http` | HTTP middleware |
+| `sqlx` | Database access (SQLite/PostgreSQL) |
+| `jsonwebtoken` | JWT token validation |
+| `uuid` | Unique identifiers |
+| `chrono` | Date/time handling |
+
 ---
 
 ## 📁 Project Structure
@@ -203,9 +214,17 @@ synmem/
 │   │   │   └── lib.rs
 │   │   └── Cargo.toml
 │   │
-│   └── synmem-cli/               # CLI Binary
+│   ├── synmem-cli/               # CLI Binary
 │       ├── src/
 │       │   └── main.rs
+│       └── Cargo.toml
+│
+│   └── synmem-cloud/             # Cloud Infrastructure (Phase 6.1)
+│       ├── src/
+│       │   ├── lib.rs            # Public exports
+│       │   ├── domain/           # Domain models (Tier, User, ApiKey, etc.)
+│       │   ├── services/         # Auth, BrowserPool, Session, Storage
+│       │   └── api/              # REST API Gateway and routes
 │       └── Cargo.toml
 │
 ├── extension/                    # Chrome Extension
@@ -328,10 +347,88 @@ synmem/
 - [ ] Product Hunt launch
 
 ### Phase 6: Monetization (Post-launch)
-- [ ] SynMem Cloud infrastructure
+- [x] SynMem Cloud infrastructure (crates/synmem-cloud)
 - [ ] Subscription system
 - [ ] Scraper marketplace
 - [ ] Enterprise features
+
+---
+
+## ☁️ Cloud Infrastructure (Phase 6.1)
+
+### Architecture
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          SYNMEM CLOUD                                        │
+│                                                                              │
+│  [User] → [API Gateway] → [Session Service]                                  │
+│                        → [Browser Pool]                                      │
+│                        → [Storage Service]                                   │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │                         Cloud Stack                                      ││
+│  │  - Compute: Fly.io or Railway (containers)                              ││
+│  │  - Database: Turso (SQLite edge) or PlanetScale                         ││
+│  │  - Auth: Clerk or Auth0                                                 ││
+│  │  - Payments: Stripe                                                      ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Cloud Features
+1. **Browser Sessions in Cloud**: Run headless browsers on demand
+2. **Session Sync**: Sync sessions (cookies, storage) across devices
+3. **API Access**: REST API for programmatic access
+4. **Analytics**: Usage dashboard and metrics
+
+### Pricing Tiers
+```rust
+enum Tier {
+    Free,      // 100 scrapes/month, local only
+    Pro,       // Unlimited, cloud sessions, API, $19/month
+    Enterprise // Custom limits, SLA, support
+}
+```
+
+### Tier Features
+| Feature | Free | Pro | Enterprise |
+|---------|------|-----|------------|
+| Monthly Scrapes | 100 | Unlimited | Custom |
+| Cloud Sessions | ❌ | ✅ (5 concurrent) | ✅ (50 concurrent) |
+| API Access | ❌ | ✅ | ✅ |
+| Rate Limit | 10/min | 100/min | 1000/min |
+| SLA | ❌ | ❌ | ✅ |
+| Support | Community | Email | Dedicated |
+
+### Security (SOC2 Prep)
+- API keys with scopes (read, write, admin, browser_sessions, session_sync)
+- Rate limiting per tier
+- Audit logging for all operations
+- JWT authentication via external provider
+
+### Cloud Crate Structure
+```
+crates/synmem-cloud/
+├── src/
+│   ├── lib.rs              # Public exports
+│   ├── domain/             # Domain models
+│   │   ├── tier.rs         # Subscription tiers
+│   │   ├── user.rs         # User accounts
+│   │   ├── api_key.rs      # API key management
+│   │   ├── rate_limit.rs   # Rate limiting
+│   │   └── audit.rs        # Audit logging
+│   ├── services/           # Service implementations
+│   │   ├── auth.rs         # Authentication service
+│   │   ├── browser_pool.rs # Browser pool management
+│   │   ├── session.rs      # Session sync service
+│   │   └── storage.rs      # Cloud storage service
+│   └── api/                # REST API
+│       ├── gateway.rs      # API Gateway
+│       ├── routes.rs       # API routes
+│       ├── middleware.rs   # Auth/rate limit middleware
+│       └── error.rs        # API error types
+└── Cargo.toml
+```
 
 ---
 
