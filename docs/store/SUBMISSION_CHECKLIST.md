@@ -77,7 +77,7 @@ zip -r synmem-extension.zip dist/
 
 ## Quick Reference
 
-### Short Description (96 chars)
+### Short Description (96 of 132 chars)
 ```
 Give your AI agents memory. Capture conversations, automate browsing, search everything via MCP.
 ```

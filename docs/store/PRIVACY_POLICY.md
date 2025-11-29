@@ -79,7 +79,7 @@ For users in the European Union:
 
 ## Children's Privacy
 
-SynMem is not intended for use by children under 13 years of age. We do not knowingly collect personal information from children.
+SynMem is not intended for use by children under 13 years of age. While the extension does not collect personal information, it is designed for adult users working with AI tools.
 
 ## Changes to This Policy
 
