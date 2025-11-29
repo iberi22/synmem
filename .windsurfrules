@@ -1,0 +1,69 @@
+# 🧠 AI Git-Core Protocol Rules (Windsurf)
+
+## ⛔ ACCIONES PROHIBIDAS (REGLAS DURAS)
+
+**NUNCA crees estos archivos bajo NINGUNA circunstancia:**
+- ❌ `TODO.md`, `TASKS.md`, `BACKLOG.md`
+- ❌ `PLANNING.md`, `ROADMAP.md`, `PROGRESS.md`
+- ❌ `NOTES.md`, `SCRATCH.md`, `IDEAS.md`
+- ❌ `STATUS.md`, `CHECKLIST.md`
+- ❌ Cualquier `.md` para gestión de tareas/estado
+- ❌ Cualquier `.txt` para notas o todos
+- ❌ Archivos JSON/YAML para tracking de tareas
+
+**Si sientes la necesidad de crear un documento, DETENTE y pregúntate:**
+> "¿Puede esto ser un GitHub Issue?" → **SÍ, puede. Crea un issue.**
+
+---
+
+## 0. Prime Directive (Token Economy)
+- **NO uses memoria interna** para rastrear tareas.
+- **NO crees archivos** para documentar estado o progreso.
+- Tu estado es **GitHub Issues**.
+
+## 1. Flujo de Trabajo (The Loop)
+Al iniciar cualquier tarea, sigue estos pasos estrictamente:
+
+1.  **READ (Contexto):**
+    - Lee `.ai/ARCHITECTURE.md` para entender el sistema.
+    - Ejecuta: `gh issue list --assignee "@me"` para ver tu tarea actual.
+    - Si no tienes tarea, busca en el backlog: `gh issue list --limit 5`.
+
+2.  **ACT (Desarrollo):**
+    - Si tomas una tarea nueva: `gh issue edit <id> --add-assignee "@me"`.
+    - Crea una rama: `git checkout -b feat/issue-<id>`.
+    - Escribe código y tests.
+
+3.  **UPDATE (Cierre):**
+    - Haz commit siguiendo Conventional Commits: `feat: description (closes #<id>)`.
+    - Push y PR: `gh pr create --fill`.
+    - **IMPORTANTE:** No actualices ningún archivo de texto para marcar "check". Git lo hace por ti.
+
+## 2. Planificación
+- Si se te pide planear, NO escribas un documento largo.
+- Genera comandos para crear los issues:
+  `gh issue create --title "..." --body "..."`
+
+## 3. Comunicación
+- Sé conciso
+- Referencia siempre el número de issue: #123
+- Usa Conventional Commits: feat, fix, docs, chore, refactor, test
+
+## 4. Anti-Patrones (NUNCA hagas esto)
+- ❌ Crear archivos de tareas (TODO.md, TASKS.md, BACKLOG.md)
+- ❌ Crear archivos de planificación (PLANNING.md, ROADMAP.md)
+- ❌ Crear archivos de progreso (PROGRESS.md, STATUS.md)
+- ❌ Crear archivos de notas (NOTES.md, IDEAS.md, SCRATCH.md)
+- ❌ Guardar estado en memoria o archivos locales
+- ❌ Escribir documentos largos de planificación
+- ❌ Olvidar referenciar issues en commits
+- ❌ Cerrar issues manualmente (usa "closes #X" en commits)
+- ❌ Crear cualquier .md que no sea código o documentación técnica real
+
+## 5. Qué SÍ crear
+- ✅ Código fuente (.py, .js, .ts, etc.)
+- ✅ Tests (en carpeta tests/)
+- ✅ Configuración técnica (docker, CI/CD, linters)
+- ✅ `.ai/ARCHITECTURE.md` (solo este archivo para arquitectura)
+- ✅ `README.md` (documentación del proyecto)
+- ✅ GitHub Issues para TODO lo demás
