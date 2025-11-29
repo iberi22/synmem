@@ -1,0 +1,29 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/synmem-core",
+    "crates/synmem-storage",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["SynMem Team"]
+license = "Apache-2.0"
+repository = "https://github.com/iberi22/synmem"
+
+[workspace.dependencies]
+# Core dependencies
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+async-trait = "0.1"
+thiserror = "2"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+tracing = "0.1"
+
+# Storage dependencies
+rusqlite = { version = "0.31", features = ["bundled", "modern_sqlite"] }
+r2d2 = "0.8"
+r2d2_sqlite = "0.24"
