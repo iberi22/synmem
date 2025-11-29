@@ -1,0 +1,23 @@
+[package]
+name = "synmem-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "CLI binary for SynMem"
+
+[[bin]]
+name = "synmem"
+path = "src/main.rs"
+
+[dependencies]
+synmem-core.workspace = true
+synmem-browser.workspace = true
+synmem-storage.workspace = true
+synmem-mcp.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
