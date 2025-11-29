@@ -1,0 +1,3 @@
+//! Domain layer containing entities and services
+
+pub mod entities;
