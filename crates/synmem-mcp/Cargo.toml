@@ -1,0 +1,29 @@
+[package]
+name = "synmem-mcp"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "MCP server adapter for SynMem with memory/search tools"
+
+[dependencies]
+synmem-core = { path = "../synmem-core" }
+synmem-storage = { path = "../synmem-storage" }
+rmcp = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+async-trait = { workspace = true }
+tokio = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+
+[dev-dependencies]
+tokio-test = { workspace = true }
+
+[[bin]]
+name = "synmem-mcp"
+path = "src/main.rs"
