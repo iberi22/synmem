@@ -12,6 +12,9 @@ build/
 *.egg-info/
 target/
 
+# Astro
+.astro/
+
 # IDE/Editor
 .idea/
 .vscode/
