@@ -7,11 +7,11 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, info, instrument};
 
-use synmem_core::domain::entities::{Cookie, Session, SameSite, StorageEntry};
+use synmem_core::domain::entities::{BrowserState, SimpleCookie, SameSite, StorageEntry};
 use synmem_core::ports::outbound::BrowserDriverPort;
 
 use super::error::ChromiumError;
-use super::session_manager::SessionManager;
+use super::session_manager::BrowserStateManager;
 
 /// ChromiumDriver provides browser automation using chromiumoxide
 ///
@@ -20,7 +20,7 @@ use super::session_manager::SessionManager;
 pub struct ChromiumDriver {
     browser: Arc<Browser>,
     page: Arc<RwLock<Option<Page>>>,
-    session_manager: SessionManager,
+    session_manager: BrowserStateManager,
 }
 
 impl ChromiumDriver {
@@ -68,7 +68,7 @@ impl ChromiumDriver {
 
         let browser = Arc::new(browser);
         let page = Arc::new(RwLock::new(None));
-        let session_manager = SessionManager::new();
+        let session_manager = BrowserStateManager::new();
 
         info!("Browser launched successfully");
 
@@ -99,8 +99,8 @@ impl ChromiumDriver {
     }
 
     /// Convert chromiumoxide cookie to domain cookie
-    fn convert_cookie(cdp_cookie: &chromiumoxide::cdp::browser_protocol::network::Cookie) -> Cookie {
-        Cookie {
+    fn convert_cookie(cdp_cookie: &chromiumoxide::cdp::browser_protocol::network::Cookie) -> SimpleCookie {
+        SimpleCookie {
             name: cdp_cookie.name.clone(),
             value: cdp_cookie.value.clone(),
             domain: cdp_cookie.domain.clone(),
@@ -322,7 +322,7 @@ impl BrowserDriverPort for ChromiumDriver {
     // === Session Management ===
 
     #[instrument(skip(self))]
-    async fn get_cookies(&self) -> Result<Vec<Cookie>, Self::Error> {
+    async fn get_cookies(&self) -> Result<Vec<SimpleCookie>, Self::Error> {
         debug!("Getting cookies");
         let page = self.get_or_create_page().await?;
         let cookies = page
@@ -334,7 +334,7 @@ impl BrowserDriverPort for ChromiumDriver {
     }
 
     #[instrument(skip(self))]
-    async fn set_cookies(&self, cookies: &[Cookie]) -> Result<(), Self::Error> {
+    async fn set_cookies(&self, cookies: &[SimpleCookie]) -> Result<(), Self::Error> {
         debug!(count = %cookies.len(), "Setting cookies");
         let page = self.get_or_create_page().await?;
 
@@ -357,7 +357,7 @@ impl BrowserDriverPort for ChromiumDriver {
     }
 
     #[instrument(skip(self))]
-    async fn save_session(&self) -> Result<Session, Self::Error> {
+    async fn save_session(&self) -> Result<BrowserState, Self::Error> {
         debug!("Saving session");
         let cookies = self.get_cookies().await?;
         let page = self.get_or_create_page().await?;
@@ -408,7 +408,7 @@ impl BrowserDriverPort for ChromiumDriver {
             .collect();
 
         let session_id = uuid_v4();
-        let session = Session {
+        let browser_state = BrowserState {
             id: session_id,
             name: format!("Session at {}", url),
             cookies,
@@ -416,21 +416,21 @@ impl BrowserDriverPort for ChromiumDriver {
             session_storage,
         };
 
-        self.session_manager.save(&session);
-        Ok(session)
+        self.session_manager.save(&browser_state);
+        Ok(browser_state)
     }
 
-    #[instrument(skip(self, session))]
-    async fn load_session(&self, session: &Session) -> Result<(), Self::Error> {
-        debug!(session_id = %session.id, "Loading session");
+    #[instrument(skip(self, browser_state))]
+    async fn load_session(&self, browser_state: &BrowserState) -> Result<(), Self::Error> {
+        debug!(session_id = %browser_state.id, "Loading session");
 
         // Set cookies
-        self.set_cookies(&session.cookies).await?;
+        self.set_cookies(&browser_state.cookies).await?;
 
         let page = self.get_or_create_page().await?;
 
         // Restore local storage
-        for entry in &session.local_storage {
+        for entry in &browser_state.local_storage {
             let escaped_key = escape_js_string(&entry.key);
             let escaped_value = escape_js_string(&entry.value);
             let script = format!(
@@ -442,7 +442,7 @@ impl BrowserDriverPort for ChromiumDriver {
         }
 
         // Restore session storage
-        for entry in &session.session_storage {
+        for entry in &browser_state.session_storage {
             let escaped_key = escape_js_string(&entry.key);
             let escaped_value = escape_js_string(&entry.value);
             let script = format!(

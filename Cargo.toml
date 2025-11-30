@@ -11,6 +11,8 @@ version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
 authors = ["SynMem Contributors"]
+repository = "https://github.com/iberi22/synmem"
+rust-version = "1.70"
 
 [workspace.dependencies]
 # Async runtime
@@ -36,3 +38,17 @@ chromiumoxide = { version = "0.7", features = ["tokio-runtime"] }
 
 # Parallelization
 rayon = "1"
+
+# Datetime & UUID
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+base64 = "0.21"
+
+# Security dependencies
+ring = "0.17"
+argon2 = "0.5"
+zeroize = { version = "1", features = ["derive"] }
+
+# Testing
+tokio-test = "0.4"
+tempfile = "3"

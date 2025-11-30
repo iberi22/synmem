@@ -1,4 +1,4 @@
-//! Domain layer containing entities and services
+//! Domain layer - Contains business entities and services
 
 pub mod entities;
 pub mod services;

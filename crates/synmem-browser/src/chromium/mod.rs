@@ -7,3 +7,4 @@ mod error;
 
 pub use driver::ChromiumDriver;
 pub use error::ChromiumError;
+pub use session_manager::BrowserStateManager;

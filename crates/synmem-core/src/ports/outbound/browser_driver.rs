@@ -3,7 +3,7 @@
 //! This port defines the interface that browser drivers must implement
 //! to provide browser automation capabilities.
 
-use crate::domain::entities::{Cookie, Session};
+use crate::domain::entities::{BrowserState, SimpleCookie};
 use async_trait::async_trait;
 use std::error::Error;
 
@@ -61,16 +61,16 @@ pub trait BrowserDriverPort: Send + Sync {
     // === Session Management ===
 
     /// Get all cookies
-    async fn get_cookies(&self) -> Result<Vec<Cookie>, Self::Error>;
+    async fn get_cookies(&self) -> Result<Vec<SimpleCookie>, Self::Error>;
 
     /// Set cookies
-    async fn set_cookies(&self, cookies: &[Cookie]) -> Result<(), Self::Error>;
+    async fn set_cookies(&self, cookies: &[SimpleCookie]) -> Result<(), Self::Error>;
 
-    /// Save the current session state
-    async fn save_session(&self) -> Result<Session, Self::Error>;
+    /// Save the current browser state (cookies, storage)
+    async fn save_session(&self) -> Result<BrowserState, Self::Error>;
 
-    /// Load a saved session state
-    async fn load_session(&self, session: &Session) -> Result<(), Self::Error>;
+    /// Load a saved browser state
+    async fn load_session(&self, state: &BrowserState) -> Result<(), Self::Error>;
 
     /// Clear all session data (cookies, storage)
     async fn clear_session(&self) -> Result<(), Self::Error>;

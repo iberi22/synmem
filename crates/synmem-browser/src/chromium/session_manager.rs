@@ -1,48 +1,48 @@
-//! Session manager for storing and retrieving browser sessions
+//! Session manager for storing and retrieving browser state
 
 use std::collections::HashMap;
 use std::sync::RwLock;
-use synmem_core::domain::entities::Session;
+use synmem_core::domain::entities::BrowserState;
 
-/// Manages browser sessions in memory
-pub struct SessionManager {
-    sessions: RwLock<HashMap<String, Session>>,
+/// Manages browser state in memory
+pub struct BrowserStateManager {
+    states: RwLock<HashMap<String, BrowserState>>,
 }
 
-impl SessionManager {
-    /// Create a new session manager
+impl BrowserStateManager {
+    /// Create a new browser state manager
     pub fn new() -> Self {
         Self {
-            sessions: RwLock::new(HashMap::new()),
+            states: RwLock::new(HashMap::new()),
         }
     }
 
-    /// Save a session
-    pub fn save(&self, session: &Session) {
-        let mut sessions = self.sessions.write().unwrap();
-        sessions.insert(session.id.clone(), session.clone());
+    /// Save a browser state
+    pub fn save(&self, state: &BrowserState) {
+        let mut states = self.states.write().unwrap();
+        states.insert(state.id.clone(), state.clone());
     }
 
-    /// Get a session by ID
-    pub fn get(&self, id: &str) -> Option<Session> {
-        let sessions = self.sessions.read().unwrap();
-        sessions.get(id).cloned()
+    /// Get a browser state by ID
+    pub fn get(&self, id: &str) -> Option<BrowserState> {
+        let states = self.states.read().unwrap();
+        states.get(id).cloned()
     }
 
-    /// List all session IDs
+    /// List all state IDs
     pub fn list(&self) -> Vec<String> {
-        let sessions = self.sessions.read().unwrap();
-        sessions.keys().cloned().collect()
+        let states = self.states.read().unwrap();
+        states.keys().cloned().collect()
     }
 
-    /// Delete a session by ID
-    pub fn delete(&self, id: &str) -> Option<Session> {
-        let mut sessions = self.sessions.write().unwrap();
-        sessions.remove(id)
+    /// Delete a browser state by ID
+    pub fn delete(&self, id: &str) -> Option<BrowserState> {
+        let mut states = self.states.write().unwrap();
+        states.remove(id)
     }
 }
 
-impl Default for SessionManager {
+impl Default for BrowserStateManager {
     fn default() -> Self {
         Self::new()
     }
@@ -53,11 +53,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_session_manager() {
-        let manager = SessionManager::new();
-        let session = Session::new("test-session").with_name("Test Session");
+    fn test_browser_state_manager() {
+        let manager = BrowserStateManager::new();
+        let state = BrowserState::new("test-session").with_name("Test Session");
 
-        manager.save(&session);
+        manager.save(&state);
         
         let retrieved = manager.get("test-session");
         assert!(retrieved.is_some());

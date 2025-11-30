@@ -1,9 +1,11 @@
 [package]
 name = "synmem-core"
+description = "Core domain and application layer for SynMem - Session management with encryption"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Core domain and application layer for SynMem browser agent"
+authors.workspace = true
+repository.workspace = true
 
 [dependencies]
 tokio = { workspace = true }
@@ -12,6 +14,15 @@ serde_json = { workspace = true }
 thiserror = { workspace = true }
 async-trait = { workspace = true }
 tracing = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+base64 = { workspace = true }
+
+# Security dependencies
+ring = { workspace = true }
+argon2 = { workspace = true }
+zeroize = { workspace = true }
 
 [dev-dependencies]
-tokio-test = "0.4"
+tokio-test = { workspace = true }
+tempfile = { workspace = true }
