@@ -1,83 +1,32 @@
-//! # Browser Control Port
-//!
-//! Inbound port for browser navigation and interaction.
+//! Browser control inbound port
 
 use async_trait::async_trait;
-use thiserror::Error;
-use url::Url;
+use std::error::Error;
 
-/// Errors that can occur during browser control operations.
-#[derive(Debug, Error)]
-pub enum BrowserControlError {
-    #[error("navigation failed: {0}")]
-    NavigationFailed(String),
-
-    #[error("element not found: {0}")]
-    ElementNotFound(String),
-
-    #[error("click failed: {0}")]
-    ClickFailed(String),
-
-    #[error("type failed: {0}")]
-    TypeFailed(String),
-
-    #[error("screenshot failed: {0}")]
-    ScreenshotFailed(String),
-
-    #[error("timeout: {0}")]
-    Timeout(String),
-
-    #[error("browser not connected")]
-    NotConnected,
-}
-
-/// Result type for browser control operations.
-pub type BrowserControlResult<T> = Result<T, BrowserControlError>;
-
-/// Screenshot data with format information.
-#[derive(Debug, Clone)]
-pub struct Screenshot {
-    /// Raw image data (PNG format).
-    pub data: Vec<u8>,
-    /// Width in pixels.
-    pub width: u32,
-    /// Height in pixels.
-    pub height: u32,
-}
-
-/// Options for taking screenshots.
-#[derive(Debug, Clone, Default)]
-pub struct ScreenshotOptions {
-    /// Capture the full page (scroll capture).
-    pub full_page: bool,
-    /// Specific element selector to capture.
-    pub selector: Option<String>,
-}
-
-/// Options for navigation.
-#[derive(Debug, Clone, Default)]
-pub struct NavigateOptions {
-    /// Wait for network idle before returning.
-    pub wait_for_network_idle: bool,
-    /// Timeout in milliseconds.
-    pub timeout_ms: Option<u64>,
-}
-
-/// Inbound port for browser control operations.
-///
-/// This port defines the interface for navigating, clicking, typing,
-/// and capturing screenshots in a browser.
+/// Port for controlling browser operations
 #[async_trait]
 pub trait BrowserControlPort: Send + Sync {
-    /// Navigate to a URL.
-    async fn navigate(&self, url: &Url, options: NavigateOptions) -> BrowserControlResult<()>;
+    /// Error type for this port
+    type Error: Error + Send + Sync + 'static;
 
-    /// Click on an element identified by a CSS selector.
-    async fn click(&self, selector: &str) -> BrowserControlResult<()>;
+    /// Navigate to a URL
+    async fn navigate_to(&self, url: &str) -> Result<(), Self::Error>;
 
-    /// Type text into an element identified by a CSS selector.
-    async fn type_text(&self, selector: &str, text: &str) -> BrowserControlResult<()>;
+    /// Go back in history
+    async fn go_back(&self) -> Result<(), Self::Error>;
 
-    /// Take a screenshot of the current page.
-    async fn screenshot(&self, options: ScreenshotOptions) -> BrowserControlResult<Screenshot>;
+    /// Go forward in history
+    async fn go_forward(&self) -> Result<(), Self::Error>;
+
+    /// Refresh the page
+    async fn refresh(&self) -> Result<(), Self::Error>;
+
+    /// Click on an element
+    async fn click(&self, selector: &str) -> Result<(), Self::Error>;
+
+    /// Type text into an element
+    async fn type_text(&self, selector: &str, text: &str) -> Result<(), Self::Error>;
+
+    /// Take a screenshot
+    async fn screenshot(&self) -> Result<Vec<u8>, Self::Error>;
 }

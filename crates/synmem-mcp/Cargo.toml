@@ -1,9 +1,9 @@
 [package]
-name = "synmem-core"
+name = "synmem-mcp"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Core domain and application layer for SynMem browser agent"
+description = "MCP Server tools for SynMem browser automation"
 
 [dependencies]
 tokio = { workspace = true }
