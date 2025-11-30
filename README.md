@@ -1,48 +1,194 @@
-# 🧠 Git-Core Protocol
+# 🧠 SynMem - Synthetic Memory Browser Agent
 
-> **AI-Driven Project Management Template** | Plantilla de Gestión de Proyectos con IA
+[![CI](https://github.com/iberi22/synmem/actions/workflows/ci.yml/badge.svg)](https://github.com/iberi22/synmem/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
 
-[![Use this template](https://img.shields.io/badge/Use%20this-template-blue?style=for-the-badge)](https://github.com/iberi22/ai-git-core-template/generate)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-
----
-
-## 🌍 Language | Idioma | Língua | Sprache | Langue | 言語 | 语言
-
-| Flag | Language | Link |
-|:----:|----------|------|
-| 🇺🇸 | **English** | [Jump to English](#-english) |
-| 🇪🇸 | **Español** | [Ir a Español](#-español) |
-| 🇧🇷 | **Português** | [Ir para Português](#-português) |
-| 🇩🇪 | **Deutsch** | [Zu Deutsch](#-deutsch) |
-| 🇫🇷 | **Français** | [Aller au Français](#-français) |
-| 🇯🇵 | **日本語** | [日本語へ](#-日本語) |
-| 🇨🇳 | **中文** | [跳转到中文](#-中文) |
+> **The most advanced synthetic memory system for AI agents** - Navigate, scrape, and automate the web with your authenticated sessions, all exposed via MCP.
 
 ---
 
-# 🇺🇸 English
+## ✨ Features
 
-## 🚀 Quick Start - Just Copy This Prompt!
+- 🌐 **Browser Automation** - Navigate, click, type, scroll with full browser control
+- 📊 **Smart Scraping** - Extract structured content with site-specific scrapers
+- 💾 **Semantic Memory** - Store and search browsing history with embeddings
+- 🤖 **MCP Integration** - Works seamlessly with Claude Desktop and other MCP clients
+- 🔌 **Chrome Extension** - Capture content from authenticated sessions
+- ⚡ **High Performance** - Rust-powered with parallel processing via Rayon
 
-> **Copy this prompt to your AI coding agent (Copilot, Cursor, Claude, etc.) to auto-setup:**
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/iberi22/synmem.git
+cd synmem
+
+# Build with Rust
+cargo build --release
+```
+
+### Configure Claude Desktop
+
+Add to your Claude Desktop config (`~/.config/claude/config.json`):
+
+```json
+{
+  "mcpServers": {
+    "synmem": {
+      "command": "synmem-mcp",
+      "args": ["serve"]
+    }
+  }
+}
+```
+
+### Start Using
+
+Once connected, you can use natural language commands like:
 
 ```
-Initialize this project with Git-Core Protocol. Run:
-$env:GIT_CORE_AUTO = "1"; irm https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.ps1 | iex
-Then execute: .\scripts\init_project.ps1 -Auto
-After setup, read .ai/ARCHITECTURE.md and start with the first issue from: gh issue list
+Navigate to https://news.ycombinator.com and get me the top stories
 ```
 
-For Linux/Mac:
 ```
-Initialize this project with Git-Core Protocol. Run:
-curl -sL https://raw.githubusercontent.com/iberi22/ai-git-core-template/main/install.sh | bash -s -- --auto
-Then execute: ./scripts/init_project.sh
-After setup, read .ai/ARCHITECTURE.md and start with the first issue from: gh issue list
+Save my ChatGPT conversation about Rust async programming
+```
+
+```
+Search my memory for articles about database migrations
 ```
 
 ---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Quick Start](docs/README.md) | Get up and running in minutes |
+| [Installation](docs/INSTALLATION.md) | Detailed installation guide (Windows focus) |
+| [MCP Tools](docs/MCP_TOOLS.md) | Complete MCP tools reference |
+| [Extension API](docs/EXTENSION_API.md) | Chrome extension documentation |
+| [Architecture](docs/ARCHITECTURE.md) | Technical deep-dive |
+| [Security](docs/SECURITY.md) | Security practices and guidelines |
+| [Contributing](docs/CONTRIBUTING.md) | How to contribute |
+
+### Examples
+
+- [Basic Scraping](docs/examples/basic_scraping.md) - Extract content from websites
+- [Twitter Automation](docs/examples/twitter_automation.md) - Automate Twitter interactions
+- [Chat Capture](docs/examples/chat_capture.md) - Capture AI chat conversations
+
+---
+
+## 🛠️ MCP Tools
+
+SynMem exposes powerful tools via MCP:
+
+### Navigation
+- `navigate_to` - Go to any URL
+- `click` - Click on elements
+- `type_text` - Type into inputs
+- `screenshot` - Capture screenshots
+
+### Scraping
+- `scrape_page` - Extract structured content
+- `scrape_chat` - Capture AI conversations
+- `extract_links` - Get all page links
+- `extract_text` - Get clean text
+
+### Memory
+- `search_memory` - Semantic search across history
+- `get_recent` - Recent pages and chats
+- `save_context` - Bookmark current context
+
+### Automation
+- `record_macro` - Record action sequences
+- `play_macro` - Replay recorded macros
+- `fill_form` - Auto-fill forms
+
+[See full MCP Tools Reference →](docs/MCP_TOOLS.md)
+
+---
+
+## 🏗️ Architecture
+
+SynMem uses **Hexagonal Architecture** (Ports & Adapters) for flexibility and testability:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        SYNMEM CORE                          │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │              DOMAIN LAYER (Services)                   │  │
+│  └───────────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │           APPLICATION LAYER (Ports)                    │  │
+│  └───────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+         │                    │                    │
+    MCP Server          Extension            REST API
+    (Primary)           (Primary)           (Primary)
+         │                    │                    │
+    Chromium             SQLite              Embeddings
+    (Secondary)         (Secondary)         (Secondary)
+```
+
+[See Architecture Documentation →](docs/ARCHITECTURE.md)
+
+---
+
+## 🔒 Security
+
+- **Encrypted at rest** - Cookies and tokens encrypted with AES-256-GCM
+- **Local-first** - All data stays on your machine by default
+- **Minimal permissions** - Extension uses only necessary permissions
+- **Rate limiting** - Built-in protection against abuse
+
+[See Security Documentation →](docs/SECURITY.md)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See our [Contributing Guide](docs/CONTRIBUTING.md) for details.
+
+```bash
+# Setup development environment
+git clone https://github.com/iberi22/synmem.git
+cd synmem
+cargo build
+cargo test
+```
+
+---
+
+## 📄 License
+
+Apache 2.0 - See [LICENSE](LICENSE) for details.
+
+---
+
+## 🙏 Acknowledgments
+
+Built with:
+- [chromiumoxide](https://github.com/mattsse/chromiumoxide) - Browser automation
+- [tokio](https://tokio.rs/) - Async runtime
+- [rayon](https://github.com/rayon-rs/rayon) - Parallel processing
+- [MCP Protocol](https://modelcontextprotocol.io/) - AI integration
+
+---
+
+**Created with 🧠 by [@iberi22](https://github.com/iberi22)**
+
+---
+
+# 📜 Git-Core Protocol
+
+This project follows the **Git-Core Protocol** for AI-assisted development.
 
 ## 🤔 Why This Approach?
 
