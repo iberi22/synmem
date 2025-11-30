@@ -1,128 +1,82 @@
-//! # Browser Driver Port
+//! Browser driver outbound port
 //!
-//! Outbound port for actual browser interaction.
+//! This port defines the interface that browser drivers must implement
+//! to provide browser automation capabilities.
 
+use crate::domain::entities::{Cookie, Session};
 use async_trait::async_trait;
-use thiserror::Error;
-use url::Url;
+use std::error::Error;
 
-/// Errors that can occur during browser driver operations.
-#[derive(Debug, Error)]
-pub enum BrowserDriverError {
-    #[error("connection failed: {0}")]
-    ConnectionFailed(String),
-
-    #[error("navigation failed: {0}")]
-    NavigationFailed(String),
-
-    #[error("element not found: {0}")]
-    ElementNotFound(String),
-
-    #[error("execution failed: {0}")]
-    ExecutionFailed(String),
-
-    #[error("screenshot failed: {0}")]
-    ScreenshotFailed(String),
-
-    #[error("timeout: {0}")]
-    Timeout(String),
-
-    #[error("browser closed")]
-    BrowserClosed,
-}
-
-/// Result type for browser driver operations.
-pub type BrowserDriverResult<T> = Result<T, BrowserDriverError>;
-
-/// Browser viewport dimensions.
-#[derive(Debug, Clone)]
-pub struct Viewport {
-    pub width: u32,
-    pub height: u32,
-}
-
-/// Options for launching a browser instance.
-#[derive(Debug, Clone)]
-pub struct LaunchOptions {
-    /// Run browser in headless mode.
-    pub headless: bool,
-    /// Path to browser executable.
-    pub executable_path: Option<String>,
-    /// User data directory for profiles.
-    pub user_data_dir: Option<String>,
-    /// Initial viewport size.
-    pub viewport: Option<Viewport>,
-}
-
-impl Default for LaunchOptions {
-    fn default() -> Self {
-        Self {
-            headless: true,
-            executable_path: None,
-            user_data_dir: None,
-            viewport: Some(Viewport {
-                width: 1280,
-                height: 720,
-            }),
-        }
-    }
-}
-
-/// Raw page information from the browser.
-#[derive(Debug, Clone)]
-pub struct PageInfo {
-    /// Current page URL.
-    pub url: Url,
-    /// Page title.
-    pub title: Option<String>,
-}
-
-/// Options for waiting operations.
-#[derive(Debug, Clone, Default)]
-pub struct WaitOptions {
-    /// Timeout in milliseconds.
-    pub timeout_ms: Option<u64>,
-    /// Polling interval in milliseconds.
-    pub poll_interval_ms: Option<u64>,
-}
-
-/// Outbound port for actual browser interaction.
+/// Port for browser driver implementations
 ///
-/// This port defines the low-level interface for controlling a browser
-/// instance. Implementations might use chromiumoxide, Playwright, etc.
+/// This is the core interface for browser automation. Implementations
+/// can use different browser engines (chromiumoxide, headless_chrome, etc.)
 #[async_trait]
 pub trait BrowserDriverPort: Send + Sync {
-    /// Launch a new browser instance.
-    async fn launch(&self, options: LaunchOptions) -> BrowserDriverResult<()>;
+    /// Error type for this driver
+    type Error: Error + Send + Sync + 'static;
 
-    /// Close the browser instance.
-    async fn close(&self) -> BrowserDriverResult<()>;
+    // === Navigation ===
 
-    /// Navigate to a URL.
-    async fn navigate_to(&self, url: &Url) -> BrowserDriverResult<PageInfo>;
+    /// Navigate to a URL
+    async fn goto(&self, url: &str) -> Result<(), Self::Error>;
 
-    /// Execute JavaScript in the page context.
-    async fn execute_js(&self, script: &str) -> BrowserDriverResult<String>;
+    /// Go back in browser history
+    async fn back(&self) -> Result<(), Self::Error>;
 
-    /// Click on an element by selector.
-    async fn click_element(&self, selector: &str) -> BrowserDriverResult<()>;
+    /// Go forward in browser history
+    async fn forward(&self) -> Result<(), Self::Error>;
 
-    /// Type text into an element by selector.
-    async fn type_into_element(&self, selector: &str, text: &str) -> BrowserDriverResult<()>;
+    /// Refresh the current page
+    async fn refresh(&self) -> Result<(), Self::Error>;
 
-    /// Wait for an element to be present in the DOM.
-    async fn wait_for_selector(
-        &self,
-        selector: &str,
-        options: WaitOptions,
-    ) -> BrowserDriverResult<()>;
+    /// Get the current URL
+    async fn current_url(&self) -> Result<String, Self::Error>;
 
-    /// Take a screenshot and return PNG data.
-    async fn take_screenshot(&self, full_page: bool) -> BrowserDriverResult<Vec<u8>>;
+    // === Element Interaction ===
 
-    /// Get the current page HTML.
-    async fn get_html(&self) -> BrowserDriverResult<String>;
+    /// Click on an element by CSS selector
+    async fn click(&self, selector: &str) -> Result<(), Self::Error>;
 
-    /// Get the current page URL.
-    async fn get_current_url(&self) -> BrowserDriverResult<Url>;
+    /// Type text into an element
+    async fn type_text(&self, selector: &str, text: &str) -> Result<(), Self::Error>;
+
+    /// Select an option from a dropdown by value
+    async fn select(&self, selector: &str, value: &str) -> Result<(), Self::Error>;
+
+    /// Wait for an element to be present
+    async fn wait_for_element(&self, selector: &str, timeout_ms: u64) -> Result<(), Self::Error>;
+
+    // === Page Operations ===
+
+    /// Take a screenshot of the current page
+    async fn screenshot(&self) -> Result<Vec<u8>, Self::Error>;
+
+    /// Get the HTML content of the page
+    async fn get_html(&self) -> Result<String, Self::Error>;
+
+    /// Evaluate JavaScript and return the result as a string
+    async fn evaluate_js(&self, script: &str) -> Result<String, Self::Error>;
+
+    // === Session Management ===
+
+    /// Get all cookies
+    async fn get_cookies(&self) -> Result<Vec<Cookie>, Self::Error>;
+
+    /// Set cookies
+    async fn set_cookies(&self, cookies: &[Cookie]) -> Result<(), Self::Error>;
+
+    /// Save the current session state
+    async fn save_session(&self) -> Result<Session, Self::Error>;
+
+    /// Load a saved session state
+    async fn load_session(&self, session: &Session) -> Result<(), Self::Error>;
+
+    /// Clear all session data (cookies, storage)
+    async fn clear_session(&self) -> Result<(), Self::Error>;
+
+    // === Lifecycle ===
+
+    /// Close the browser
+    async fn close(&self) -> Result<(), Self::Error>;
 }

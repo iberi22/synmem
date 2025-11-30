@@ -1,17 +1,22 @@
 [package]
-name = "synmem-core"
+name = "synmem-browser"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "Core domain and application layer for SynMem browser agent"
+description = "Browser driver adapter for SynMem using chromiumoxide"
 
 [dependencies]
+synmem-core = { path = "../synmem-core" }
 tokio = { workspace = true }
+futures = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
+anyhow = { workspace = true }
 async-trait = { workspace = true }
 tracing = { workspace = true }
+chromiumoxide = { workspace = true }
+rayon = { workspace = true }
 
 [dev-dependencies]
 tokio-test = "0.4"

@@ -1,17 +1,37 @@
 [workspace]
+members = [
+    "crates/synmem-core",
+    "crates/synmem-browser",
+]
 resolver = "2"
-members = ["crates/*"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
 license = "Apache-2.0"
-repository = "https://github.com/iberi22/synmem"
+authors = ["SynMem Contributors"]
 
 [workspace.dependencies]
-async-trait = "0.1"
-thiserror = "2"
-chrono = { version = "0.4", features = ["serde"] }
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+futures = "0.3"
+
+# Serialization
 serde = { version = "1", features = ["derive"] }
-uuid = { version = "1", features = ["v4", "serde"] }
-url = { version = "2", features = ["serde"] }
+serde_json = "1"
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Async traits
+async-trait = "0.1"
+
+# Tracing
+tracing = "0.1"
+
+# Browser automation
+chromiumoxide = { version = "0.7", features = ["tokio-runtime"] }
+
+# Parallelization
+rayon = "1"
