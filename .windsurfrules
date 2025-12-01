@@ -66,4 +66,142 @@ Al iniciar cualquier tarea, sigue estos pasos estrictamente:
 - ✅ Configuración técnica (docker, CI/CD, linters)
 - ✅ `.ai/ARCHITECTURE.md` (solo este archivo para arquitectura)
 - ✅ `README.md` (documentación del proyecto)
+- ✅ `docs/agent-docs/*.md` (**SOLO cuando usuario lo solicita explícitamente**)
 - ✅ GitHub Issues para TODO lo demás
+
+## 6. Documentos Solicitados por Usuario (agent-docs)
+
+Cuando el usuario **EXPLÍCITAMENTE** solicita un documento persistente:
+
+```bash
+# Crear en docs/agent-docs/ con prefijo:
+# PROMPT_, RESEARCH_, STRATEGY_, ANALYSIS_, SPEC_, GUIDE_, REPORT_
+
+docs/agent-docs/PROMPT_JULES_AUTH_SYSTEM.md
+```
+
+**✅ Crear archivo SOLO cuando usuario dice:**
+
+- "Guarda esto como documento"
+- "Crea un archivo de prompt para..."
+- "Documenta esta estrategia"
+- "Escribe un spec para..."
+
+**❌ NO crear archivos, solo responder en chat:**
+
+- "Explícame cómo..."
+- "Resume esto..."
+- "¿Cuál es el mejor enfoque..."
+
+## 7. Meta Tags YAML Frontmatter (REQUERIDO)
+
+Al crear `docs/agent-docs/*.md`, **SIEMPRE** incluir YAML frontmatter:
+
+```yaml
+---
+title: "Título del Documento"
+type: PROMPT | RESEARCH | STRATEGY | SPEC | GUIDE | REPORT | ANALYSIS
+id: "id-unico-kebab-case"
+created: 2025-11-29
+updated: 2025-11-29
+agent: windsurf
+model: gpt-4o | claude-opus-4
+requested_by: user
+summary: |
+  1-3 oraciones describiendo el propósito del documento.
+  Los agentes AI leen esto primero para decidir si necesitan el contenido completo.
+keywords: [keyword1, keyword2, keyword3]
+tags: ["#tag1", "#tag2"]
+topics: [topic1, topic2]
+related_issues: ["#42"]
+project: nombre-proyecto
+module: auth | api | ui | core
+language: typescript | python | rust
+priority: critical | high | medium | low
+status: draft | review | approved | deprecated
+confidence: 0.95
+token_estimate: 800
+complexity: simple | moderate | complex
+---
+```
+
+**¿Por qué?** Permite escaneo rápido de AI sin leer documentos completos.
+
+## 8. Commits Extendidos (AI-Context)
+
+Usa AI-Context footer para decisiones complejas:
+
+```text
+feat(auth): implement OAuth2 login #42
+
+Adds OAuth2 authentication with Google provider.
+
+AI-Context: architecture | Chose passport.js over custom impl for maintainability
+```
+
+## 9. Integración Codex CLI
+
+**Modos de uso:**
+
+```bash
+codex                      # Modo interactivo
+codex "explain this code"  # Query rápido
+codex exec "..."           # Automatización headless
+```
+
+**Triggers vía GitHub:**
+
+- Agrega label `codex-review` a PR para review automatizado
+- Comenta `/codex-review` para review on-demand
+- Comenta `/codex-analyze` para análisis de codebase
+
+## 10. Copilot Coding Agent
+
+**Asignar issues a Copilot:**
+
+```bash
+gh issue edit <number> --add-assignee "Copilot"
+# O
+gh issue edit <number> --add-label "copilot"
+```
+
+**Triggers en PRs:**
+
+- Menciona `@copilot` en comentarios de PR para tareas específicas
+- Copilot crea branches con nombre `copilot/*`
+
+**Monitorear trabajo de Copilot:**
+
+```bash
+gh pr list --head "copilot/"
+```
+
+## 11. Google Jules Agent
+
+**Asignar issues a Jules:**
+
+```bash
+# Vía GitHub label (requiere Jules GitHub App)
+gh issue edit <number> --add-label "jules"
+```
+
+**Vía Jules CLI:**
+
+```bash
+jules new "implement feature X"
+jules new --repo owner/repo "write unit tests"
+jules remote list --session
+jules remote pull --session <id> --apply
+```
+
+## 12. Balanceo de Carga de Agentes
+
+**Auto-despachar a agentes disponibles:**
+
+```bash
+# Agregar label ai-agent para distribución automática
+gh issue edit <number> --add-label "ai-agent"
+
+# O trigger workflow manualmente
+gh workflow run agent-dispatcher.yml
+```
