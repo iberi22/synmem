@@ -1,0 +1,84 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const posts = [
+  {
+    title: 'Introducing SynMem: Memory for AI Agents',
+    excerpt: 'Today we\'re launching SynMem, an open-source tool that gives AI assistants the ability to browse, scrape, and remember web content.',
+    date: 'Coming Soon',
+    slug: 'introducing-synmem',
+    tags: ['announcement', 'open-source'],
+  },
+  {
+    title: 'Building a Browser Automation Tool in Rust',
+    excerpt: 'A deep dive into our technical architecture and why we chose Rust with chromiumoxide for maximum performance.',
+    date: 'Coming Soon',
+    slug: 'building-browser-automation-rust',
+    tags: ['engineering', 'rust'],
+  },
+  {
+    title: 'MCP Protocol: The Future of AI Tool Integration',
+    excerpt: 'How the Model Context Protocol is changing how AI assistants interact with external tools and services.',
+    date: 'Coming Soon',
+    slug: 'mcp-protocol-future',
+    tags: ['mcp', 'ai'],
+  },
+];
+---
+
+<Layout title="Blog - SynMem">
+  <Header />
+  <main class="pt-24 pb-20">
+    <div class="section-container">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-6">Blog</h1>
+        <p class="text-gray-400 text-lg mb-12">
+          Updates, tutorials, and insights about AI agents, browser automation, and the future of web interaction.
+        </p>
+
+        <div class="space-y-8">
+          {posts.map((post) => (
+            <article class="card hover:border-gray-700 transition-colors">
+              <div class="flex flex-wrap gap-2 mb-3">
+                {post.tags.map((tag) => (
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-primary-500/10 text-primary-400">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <h2 class="text-xl font-semibold text-white mb-2 hover:text-primary-400 transition-colors">
+                <a href={`/blog/${post.slug}`}>{post.title}</a>
+              </h2>
+              <p class="text-gray-400 mb-4">{post.excerpt}</p>
+              <div class="flex items-center justify-between">
+                <time class="text-gray-500 text-sm">{post.date}</time>
+                <a href={`/blog/${post.slug}`} class="text-primary-400 text-sm hover:underline">
+                  Read more →
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div class="mt-12 p-6 bg-gray-900/50 rounded-xl border border-gray-800 text-center">
+          <p class="text-gray-400 mb-4">
+            <span class="text-primary-400 font-semibold">📬 Stay updated:</span> Subscribe to get notified when new posts are published.
+          </p>
+          <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              class="flex-1 px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500"
+            />
+            <button type="submit" class="btn-primary">
+              Subscribe
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>

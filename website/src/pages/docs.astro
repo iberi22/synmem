@@ -1,0 +1,79 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Documentation - SynMem">
+  <Header />
+  <main class="pt-24 pb-20">
+    <div class="section-container">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-6">Documentation</h1>
+        <p class="text-gray-400 text-lg mb-12">
+          Learn how to install, configure, and use SynMem with your AI assistant.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <a href="/docs/getting-started" class="card hover:border-gray-700 transition-colors group">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v20M2 12h20"/>
+                </svg>
+              </div>
+              <h2 class="text-xl font-semibold text-white group-hover:text-primary-400 transition-colors">Getting Started</h2>
+            </div>
+            <p class="text-gray-400">Install SynMem and configure your first MCP client.</p>
+          </a>
+
+          <a href="/docs/mcp-tools" class="card hover:border-gray-700 transition-colors group">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-accent-500/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+              </div>
+              <h2 class="text-xl font-semibold text-white group-hover:text-accent-400 transition-colors">MCP Tools</h2>
+            </div>
+            <p class="text-gray-400">Reference for all available tools and their parameters.</p>
+          </a>
+
+          <a href="/docs/extension" class="card hover:border-gray-700 transition-colors group">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <path d="M3 9h18"/>
+                </svg>
+              </div>
+              <h2 class="text-xl font-semibold text-white group-hover:text-primary-400 transition-colors">Chrome Extension</h2>
+            </div>
+            <p class="text-gray-400">Setup and use the browser extension for enhanced features.</p>
+          </a>
+
+          <a href="/docs/api" class="card hover:border-gray-700 transition-colors group">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-accent-500/10 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-accent-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                </svg>
+              </div>
+              <h2 class="text-xl font-semibold text-white group-hover:text-accent-400 transition-colors">API Reference</h2>
+            </div>
+            <p class="text-gray-400">Detailed API documentation for developers.</p>
+          </a>
+        </div>
+
+        <div class="mt-12 p-6 bg-gray-900/50 rounded-xl border border-gray-800">
+          <p class="text-gray-400">
+            <span class="text-primary-400 font-semibold">📘 Coming soon:</span> Full documentation is being written. 
+            In the meantime, check out the <a href="https://github.com/iberi22/synmem" class="text-primary-400 hover:underline">GitHub README</a> for setup instructions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>

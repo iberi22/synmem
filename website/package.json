@@ -1,0 +1,24 @@
+{
+  "name": "synmem-website",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "keywords": [
+    "synmem",
+    "ai",
+    "memory",
+    "browser-automation"
+  ],
+  "author": "SynMem Team",
+  "license": "MIT",
+  "description": "SynMem - Give your AI agent a memory. Landing page and documentation.",
+  "dependencies": {
+    "@astrojs/tailwind": "^5.1.5",
+    "astro": "^5.16.3",
+    "tailwindcss": "^3.4.18"
+  }
+}

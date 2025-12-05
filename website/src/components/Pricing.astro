@@ -1,0 +1,125 @@
+---
+const plans = [
+  {
+    name: 'Free',
+    price: '$0',
+    period: 'forever',
+    description: 'Perfect for personal projects and learning',
+    features: [
+      'Unlimited local scraping',
+      'SQLite memory storage',
+      'Basic MCP tools',
+      'Chrome extension',
+      'Community support',
+    ],
+    cta: 'Get Started',
+    href: '#install',
+    highlighted: false,
+  },
+  {
+    name: 'Pro',
+    price: '$19',
+    period: 'per month',
+    description: 'For power users and small teams',
+    features: [
+      'Everything in Free',
+      'Cloud memory sync',
+      'Semantic search (embeddings)',
+      'Priority support',
+      'Advanced scrapers marketplace',
+      'API access',
+    ],
+    cta: 'Coming Soon',
+    href: '#',
+    highlighted: true,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: 'per year',
+    description: 'For organizations with advanced needs',
+    features: [
+      'Everything in Pro',
+      'Self-hosted option',
+      'Custom scrapers development',
+      'SLA & dedicated support',
+      'Team management',
+      'Audit logs',
+    ],
+    cta: 'Contact Us',
+    href: 'mailto:enterprise@synmem.dev',
+    highlighted: false,
+  },
+];
+---
+
+<section id="pricing" class="py-20 md:py-32">
+  <div class="section-container">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">
+        Simple, <span class="gradient-text">transparent pricing</span>
+      </h2>
+      <p class="text-gray-400 text-lg">
+        Start free, scale when you need to. Open source core with premium cloud features.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      {plans.map((plan) => (
+        <div
+          class={`card relative ${
+            plan.highlighted
+              ? 'border-primary-500/50 shadow-lg shadow-primary-500/10'
+              : ''
+          }`}
+        >
+          {plan.highlighted && (
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+              <span class="px-3 py-1 rounded-full bg-primary-500 text-white text-xs font-semibold">
+                Most Popular
+              </span>
+            </div>
+          )}
+
+          <div class="text-center mb-6">
+            <h3 class="text-xl font-semibold text-white mb-2">{plan.name}</h3>
+            <div class="mb-2">
+              <span class="text-4xl font-bold text-white">{plan.price}</span>
+              <span class="text-gray-400 ml-1">/{plan.period}</span>
+            </div>
+            <p class="text-gray-400 text-sm">{plan.description}</p>
+          </div>
+
+          <ul class="space-y-3 mb-8">
+            {plan.features.map((feature) => (
+              <li class="flex items-start gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5 text-primary-400 shrink-0 mt-0.5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span class="text-gray-300">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <a
+            href={plan.href}
+            class={`w-full text-center ${
+              plan.highlighted ? 'btn-primary' : 'btn-secondary'
+            } ${plan.cta === 'Coming Soon' ? 'opacity-60 pointer-events-none' : ''}`}
+          >
+            {plan.cta}
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

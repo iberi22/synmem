@@ -13,6 +13,9 @@ build/
 target/
 Cargo.lock
 
+# Astro
+.astro/
+
 # IDE/Editor
 .idea/
 .vscode/
