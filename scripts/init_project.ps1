@@ -102,6 +102,30 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "✓ GitHub CLI authenticated" -ForegroundColor Green
 
+# Check for Codex CLI (optional but recommended)
+if (Get-Command codex -ErrorAction SilentlyContinue) {
+    Write-Host "✓ Codex CLI installed" -ForegroundColor Green
+} else {
+    Write-Host "⚠️  Codex CLI not found (optional)" -ForegroundColor Yellow
+    if (-not $Auto) {
+        $installCodex = Read-Host "  Install Codex CLI for AI automation? (y/N)"
+        if ($installCodex -eq "y" -or $installCodex -eq "Y") {
+            Write-Host "  Installing Codex CLI..." -ForegroundColor Cyan
+            if (Get-Command npm -ErrorAction SilentlyContinue) {
+                npm install -g @openai/codex
+                Write-Host "✓ Codex CLI installed" -ForegroundColor Green
+            } elseif (Get-Command winget -ErrorAction SilentlyContinue) {
+                winget install --id OpenAI.Codex -e
+                Write-Host "✓ Codex CLI installed" -ForegroundColor Green
+            } else {
+                Write-Host "  ⚠️  Please install manually: npm i -g @openai/codex" -ForegroundColor Yellow
+            }
+        }
+    } else {
+        Write-Host "  Install with: npm i -g @openai/codex" -ForegroundColor Cyan
+    }
+}
+
 # 2. Get project name
 $PROJECT_NAME = Split-Path -Leaf (Get-Location)
 Write-Host "`n📁 Project: $PROJECT_NAME" -ForegroundColor Yellow
@@ -123,7 +147,10 @@ if (Test-Path ".git") {
     }
 } else {
     Write-Host "`n🔧 Initializing Git repository..." -ForegroundColor Yellow
+    # Ensure default branch is 'main' (works with older Git versions)
+    git config --global init.defaultBranch main 2>$null
     git init
+    git branch -M main  # Rename to main if needed (for older Git versions)
     git add .
     git commit -m "feat: 🚀 Initial commit with Git-Core Protocol"
 }
@@ -217,7 +244,7 @@ $SKIP_ISSUES = $false
 if ($existingIssues -and $existingIssues.Count -gt 0) {
     $issueCount = (gh issue list --state all --json number | ConvertFrom-Json).Count
     Write-Host "⚠️  This repository already has $issueCount issue(s)" -ForegroundColor Yellow
-    
+
     if ($Auto) {
         Write-Host "  (Auto mode: skipping issue creation)" -ForegroundColor Cyan
         $SKIP_ISSUES = $true
@@ -232,7 +259,7 @@ if ($existingIssues -and $existingIssues.Count -gt 0) {
 
 if (-not $SKIP_ISSUES) {
     Write-Host "`n📝 Creating initial issues..." -ForegroundColor Yellow
-    
+
     gh issue create `
     --title "🏗️ SETUP: Define Architecture and Tech Stack" `
     --body @"
@@ -285,7 +312,60 @@ Keep documentation concise and practical.
     --label "ai-plan"
 }
 
-# 8. Final message
+# 8. Install pre-commit hooks for atomic commit validation
+Write-Host "`n🪝 Installing pre-commit hooks..." -ForegroundColor Yellow
+
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$hooksInstaller = Join-Path $scriptDir "hooks/install-hooks.sh"
+$preCommitHook = Join-Path $scriptDir "hooks/pre-commit"
+
+# For PowerShell, we'll install the hooks directly
+$gitHooksDir = Join-Path (Get-Location) ".git/hooks"
+if (Test-Path ".git") {
+    if (-not (Test-Path $gitHooksDir)) {
+        New-Item -ItemType Directory -Force -Path $gitHooksDir | Out-Null
+    }
+    
+    # Create the pre-commit wrapper
+    $hookContent = @'
+#!/bin/bash
+# Git-Core Protocol pre-commit hook (git-core-protocol)
+# This hook validates atomic commits based on .git-atomize.yml configuration
+# Bypass with: git commit --no-verify
+
+# Get repository root
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+HOOK_SCRIPT="$REPO_ROOT/scripts/hooks/pre-commit"
+
+# Run the hook script if it exists
+if [ -f "$HOOK_SCRIPT" ] && [ -x "$HOOK_SCRIPT" ]; then
+    exec "$HOOK_SCRIPT"
+elif [ -f "$HOOK_SCRIPT" ]; then
+    exec bash "$HOOK_SCRIPT"
+else
+    # Hook script not found, skip validation
+    echo "Note: scripts/hooks/pre-commit not found, skipping atomicity check"
+    exit 0
+fi
+'@
+    
+    $preCommitPath = Join-Path $gitHooksDir "pre-commit"
+    Set-Content -Path $preCommitPath -Value $hookContent -Encoding UTF8 -NoNewline
+    
+    # Copy example config if .git-atomize.yml doesn't exist
+    $configExample = Join-Path (Get-Location) ".git-atomize.yml.example"
+    $configFile = Join-Path (Get-Location) ".git-atomize.yml"
+    if ((Test-Path $configExample) -and (-not (Test-Path $configFile))) {
+        Copy-Item $configExample $configFile
+        Write-Host "✓ Created .git-atomize.yml from example" -ForegroundColor Green
+    }
+    
+    Write-Host "✓ Pre-commit hooks installed" -ForegroundColor Green
+} else {
+    Write-Host "⚠️  Could not install hooks (no .git directory)" -ForegroundColor Yellow
+}
+
+# 9. Final message
 Write-Host "`n==========================================" -ForegroundColor Cyan
 Write-Host "✅ Project initialized successfully!" -ForegroundColor Green
 Write-Host "==========================================" -ForegroundColor Cyan

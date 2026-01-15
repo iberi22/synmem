@@ -107,6 +107,57 @@ if ! gh auth status &> /dev/null; then
 fi
 echo -e "${GREEN}✓ GitHub CLI authenticated${NC}"
 
+# 1.1 Check for Codex CLI (optional but recommended)
+echo -e "\n🤖 Checking for Codex CLI (optional)..."
+CODEX_INSTALLED=false
+if command -v codex &> /dev/null; then
+    CODEX_VERSION=$(codex --version 2>/dev/null)
+    if [ -n "$CODEX_VERSION" ]; then
+        CODEX_INSTALLED=true
+        echo -e "${GREEN}✓ Codex CLI installed: ${CODEX_VERSION}${NC}"
+    fi
+fi
+
+if [ "$CODEX_INSTALLED" = false ]; then
+    echo -e "${YELLOW}ℹ️  Codex CLI not found (optional)${NC}"
+    echo -e "   Codex CLI enables AI-powered code reviews and analysis"
+
+    # Check if npm is available
+    if command -v npm &> /dev/null; then
+        if [ "$AUTO_MODE" = true ]; then
+            INSTALL_CODEX="n"
+        else
+            read -p "   Install Codex CLI now? (y/N): " INSTALL_CODEX
+        fi
+
+        if [[ "$INSTALL_CODEX" =~ ^[Yy]$ ]]; then
+            echo -e "   ${CYAN}Installing Codex CLI...${NC}"
+            npm i -g @openai/codex
+            if command -v codex &> /dev/null; then
+                echo -e "   ${GREEN}✓ Codex CLI installed successfully${NC}"
+                echo -e "   ${YELLOW}⚠️  Configure your API key:${NC}"
+                echo -e "      export OPENAI_API_KEY=your-api-key"
+                CODEX_INSTALLED=true
+            else
+                echo -e "   ${YELLOW}⚠️  Installation may require sudo: sudo npm i -g @openai/codex${NC}"
+            fi
+        else
+            echo -e "   ${CYAN}Skipping Codex CLI installation${NC}"
+            echo -e "   Install later: npm i -g @openai/codex"
+        fi
+    else
+        echo -e "   ${CYAN}Install with: npm i -g @openai/codex${NC}"
+    fi
+fi
+
+# Display Codex integration info
+if [ "$CODEX_INSTALLED" = true ]; then
+    echo -e "\n${CYAN}📚 Codex CLI Commands:${NC}"
+    echo -e "   codex              - Interactive mode"
+    echo -e "   codex exec \"...\"   - Headless automation"
+    echo -e "   codex --help       - Show all options"
+fi
+
 # 2. Get project name
 PROJECT_NAME=$(basename "$PWD")
 echo -e "\n📁 Project: ${YELLOW}${PROJECT_NAME}${NC}"
@@ -128,7 +179,10 @@ if [ -d ".git" ]; then
     fi
 else
     echo -e "\n🔧 Initializing Git repository..."
+    # Ensure default branch is 'main' (works with older Git versions)
+    git config --global init.defaultBranch main 2>/dev/null || true
     git init
+    git branch -M main  # Rename to main if needed (for older Git versions)
     git add .
     git commit -m "feat: 🚀 Initial commit with Git-Core Protocol"
     SKIP_REPO_CREATE=false
@@ -222,7 +276,7 @@ SKIP_ISSUES=false
 if [ "$EXISTING_ISSUES" -gt 0 ]; then
     ISSUE_COUNT=$(gh issue list --state all --json number | grep -c "number" || echo "0")
     echo -e "${YELLOW}⚠️  This repository already has $ISSUE_COUNT issue(s)${NC}"
-    
+
     if [ "$AUTO_MODE" = true ]; then
         echo -e "  ${CYAN}(Auto mode: skipping issue creation)${NC}"
         SKIP_ISSUES=true
@@ -237,7 +291,7 @@ fi
 
 if [ "$SKIP_ISSUES" = false ]; then
     echo -e "\n📝 Creating initial issues..."
-    
+
     gh issue create \
     --title "🏗️ SETUP: Define Architecture and Tech Stack" \
     --body "## Objective
@@ -284,7 +338,22 @@ Keep documentation concise and practical." \
     --label "ai-plan"
 fi
 
-# 8. Final message
+# 8. Install pre-commit hooks for atomic commit validation
+echo -e "\n🪝 Installing pre-commit hooks..."
+
+HOOKS_INSTALLER="$(dirname "$0")/hooks/install-hooks.sh"
+if [ -f "$HOOKS_INSTALLER" ]; then
+    chmod +x "$HOOKS_INSTALLER"
+    if bash "$HOOKS_INSTALLER" 2>/dev/null; then
+        echo -e "${GREEN}✓ Pre-commit hooks installed${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Could not install hooks (non-fatal)${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠️  Hook installer not found at $HOOKS_INSTALLER${NC}"
+fi
+
+# 9. Final message
 echo -e "\n=========================================="
 echo -e "${GREEN}✅ Project initialized successfully!${NC}"
 echo -e "=========================================="
