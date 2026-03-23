@@ -1,186 +1,155 @@
-# 🤖 AGENTS.md - AI Agent Configuration
-
-## Overview
-This repository follows the **Git-Core Protocol** for AI-assisted development.
-
+---
+title: "Git-Core Protocol - Agent Configuration"
+type: CONFIGURATION
+id: "config-agents"
+created: 2025-12-01
+updated: 2026-03-03
+agent: copilot
+model: claude-sonnet-4
+requested_by: system
+summary: |
+  Minimal operational profile for Git-Core 3.5.1.
+  Uses .gitcore/planning for planning and task state, and gc as primary interface.
+keywords: [agents, protocol, workflow, planning, task-management, gc-cli]
+tags: ["#gitcore", "#protocol", "#v3.5.1", "#minimal"]
+project: Git-Core-Protocol
+protocol_version: 3.5.1
 ---
 
-## ⛔ FORBIDDEN FILES (HARD RULES)
+# Git-Core Protocol (Minimal Core)
 
-**NEVER create these files under ANY circumstances:**
+## Prime Directive
 
-```
-❌ TODO.md, TASKS.md, BACKLOG.md
-❌ PLANNING.md, ROADMAP.md, PROGRESS.md
-❌ NOTES.md, SCRATCH.md, IDEAS.md
-❌ STATUS.md, CHECKLIST.md, CHANGELOG.md (for tracking)
-❌ Any .md file for task/state management
-❌ Any .txt file for notes or todos
-❌ Any JSON/YAML for task tracking
-```
+Use GitHub Issues as long-term state and `.gitcore/planning/TASK.md` as session execution state.
 
-**🚨 STOP! If you're about to create a document, ask:**
-> "Can this be a GitHub Issue?" → **YES. Always yes. Create an issue.**
+## Canonical Files
 
----
+| File | Purpose |
+|------|---------|
+| `.gitcore/ARCHITECTURE.md` | Non-negotiable architecture decisions |
+| `.gitcore/AGENT_INDEX.md` | Role routing and context loading order |
+| `.gitcore/features.json` | Feature status and verification commands |
+| `.gitcore/CLI_CONFIG.md` | Service/tool usage matrix |
+| `.gitcore/planning/PLANNING.md` | Scope, phases, constraints |
+| `.gitcore/planning/TASK.md` | Active tasks, milestones, discovered work |
+| `.github/copilot-instructions.md` | IDE-facing operational rules |
 
-## For All AI Agents (Copilot, Cursor, Windsurf, Claude, etc.)
+## Jules Agent Integration
 
-### 🎯 Prime Directive: Token Economy
-```
-Your state is GitHub Issues. Not memory. Not files. GitHub Issues.
-```
+When operating as the `Jules` agent, you MUST follow these initialization steps before proceeding with any assigned issue:
 
-### 📖 Required Reading Before Any Task
-1. `.ai/ARCHITECTURE.md` - Understand the system
-2. `gh issue list --assignee "@me"` - Your current task
-3. `gh issue list --limit 5` - Available backlog
+1. **Read context mandatory:** Execute `cat .gitcore/ARCHITECTURE.md` and `cat AGENTS.md`.
+2. **Follow protocol:** You must strictly follow the Git-Core Protocol. Do NOT track state in `TODO.md` or any unauthorized file.
+3. **Finish task correctly:** Execute the changes and ensure you run `./scripts/ai-report.ps1` before finishing the task.
 
----
+## Mandatory Execution Loop
 
-## 🔄 The Loop (Workflow)
-
-### Phase 1: READ (Context Loading)
-```bash
-# Always start here
-cat .ai/ARCHITECTURE.md
-gh issue list --assignee "@me" --state open
-```
-
-### Phase 2: ACT (Development)
-```bash
-# Claim a task
-gh issue edit <ISSUE_NUMBER> --add-assignee "@me"
-
-# Create feature branch
-git checkout -b feat/issue-<ISSUE_NUMBER>
-
-# Write code + tests
-# ...
-
-# Commit with Conventional Commits
-git add .
-git commit -m "feat(scope): description (closes #<ISSUE_NUMBER>)"
-```
-
-### Phase 3: UPDATE (Close the Loop)
-```bash
-# Push and create PR
-git push -u origin HEAD
-gh pr create --fill --base main
-
-# DO NOT manually close issues - let Git do it via commit message
-```
-
----
-
-## 🚫 Anti-Patterns (NEVER DO THIS)
-
-| ❌ Don't | ✅ Do Instead |
-|----------|---------------|
-| Create TODO.md files | Use `gh issue create` |
-| Create PLANNING.md | Use `gh issue create` with label `ai-plan` |
-| Create PROGRESS.md | Use `gh issue comment <id> --body "..."` |
-| Create NOTES.md | Add notes to relevant issue comments |
-| Track tasks in memory | Query `gh issue list` |
-| Write long planning docs | Create multiple focused issues |
-| Forget issue references | Always include `#<number>` in commits |
-| Close issues manually | Use `closes #X` in commit message |
-| Create any .md for tracking | **ALWAYS use GitHub Issues** |
-
----
-
-## ✅ What You CAN Create
-
-| ✅ Allowed | Purpose |
-|------------|----------|
-| Source code (`.py`, `.js`, `.ts`, etc.) | The actual project |
-| Tests (in `tests/` folder) | Quality assurance |
-| Config files (docker, CI/CD, linters) | Infrastructure |
-| `.ai/ARCHITECTURE.md` | System architecture (ONLY this file) |
-| `README.md` | Project documentation |
-| GitHub Issues | **EVERYTHING ELSE** |
-
----
-
-## 📋 Planning Mode
-
-When asked to plan a feature, output executable commands:
+### Phase 0: Health Check
 
 ```bash
-# Example: Planning a user authentication feature
-gh issue create --title "SETUP: Configure auth library" \
-  --body "Install and configure authentication package" \
-  --label "ai-plan"
-
-gh issue create --title "FEAT: Implement login endpoint" \
-  --body "Create POST /auth/login with JWT" \
-  --label "ai-plan"
-
-gh issue create --title "FEAT: Implement logout endpoint" \
-  --body "Create POST /auth/logout" \
-  --label "ai-plan"
-
-gh issue create --title "TEST: Auth integration tests" \
-  --body "Write e2e tests for auth flow" \
-  --label "ai-plan"
+gc check
+gc issue list --limit 5
+cat .gitcore/features.json
+cat .gitcore/planning/PLANNING.md
+cat .gitcore/planning/TASK.md
 ```
 
----
-
-## 🏷️ Label System
-
-| Label | Purpose | Color |
-|-------|---------|-------|
-| `ai-plan` | High-level planning tasks | 🟢 Green |
-| `ai-context` | Critical context information | 🟡 Yellow |
-| `bug` | Bug reports | 🔴 Red |
-| `enhancement` | Feature requests | 🔵 Blue |
-| `blocked` | Waiting on dependencies | ⚫ Gray |
-
----
-
-## 🔧 Useful Commands Reference
+### Phase 1: Read Context
 
 ```bash
-# View issues
-gh issue list
-gh issue list --label "ai-plan"
-gh issue view <number>
+cat .gitcore/ARCHITECTURE.md
+cat .gitcore/AGENT_INDEX.md
+cat docs/agent-docs/RESEARCH_STACK_CONTEXT.md
+```
 
-# Create issues
-gh issue create --title "..." --body "..." --label "..."
+### Phase 2: Execute
 
-# Update issues
-gh issue edit <number> --add-assignee "@me"
-gh issue edit <number> --add-label "in-progress"
-gh issue comment <number> --body "Progress update..."
+```bash
+gh issue edit <id> --add-assignee "@me"
+git checkout -b feat/issue-<id>
+```
 
-# PRs
+### Phase 3: Update State
+
+```bash
+git commit -m "feat(scope): short description (closes #<id>)"
 gh pr create --fill
-gh pr list
-gh pr merge <number>
+gc report
 ```
 
----
+Additionally update `.gitcore/planning/TASK.md` with:
 
-## 📁 Project Structure Awareness
+1. Task status transition.
+2. Issue reference.
+3. Commit hash for completed items.
 
+## Planning & Task Management Contract
+
+### Location Rule
+
+Planning artifacts are only valid at:
+
+- `.gitcore/planning/PLANNING.md`
+- `.gitcore/planning/TASK.md`
+
+### Content Rule
+
+`PLANNING.md` must contain:
+
+1. Scope and objectives.
+2. Constraints and decisions.
+3. Phases and success criteria.
+
+`TASK.md` must contain:
+
+1. Current phase and objective.
+2. Active tasks table.
+3. Milestones completed.
+4. Technical debt.
+5. Tasks discovered during execution.
+
+### Update Rule
+
+Before coding, read both planning files.
+After meaningful progress, update `TASK.md`.
+
+## Forbidden Files (Outside Canonical Planning Path)
+
+Do not create task/state files outside `.gitcore/planning/`:
+
+- `TODO.md`, `TASKS.md`, `BACKLOG.md`
+- `PLANNING.md`, `TASK.md`, `ROADMAP.md`, `PROGRESS.md` (outside canonical path)
+- `NOTES.md`, `SCRATCH.md`, `STATUS.md`, `CHECKLIST.md`
+- `IMPLEMENTATION*.md`, `SUMMARY.md`, `REPORT.md`
+
+## Allowed Documentation Policy
+
+Allowed paths:
+
+- `README*.md`, `AGENTS.md`, `CHANGELOG.md`, `LICENSE*`, `CONTRIBUTING*`
+- `.gitcore/**/*.md`
+- `.github/**/*.md`
+- `docs/**/*.md`
+
+Constraint: allowed files cannot replace issue or task tracking responsibilities.
+
+## Service & Tool Priority
+
+1. Primary: `gc` CLI.
+2. Secondary: `gh` for GitHub operations.
+3. Legacy scripts: compatibility wrappers only.
+
+## Architecture First Rule
+
+If issue text conflicts with `.gitcore/ARCHITECTURE.md`, architecture wins.
+
+## Commit Standard
+
+```text
+<type>(<scope>): <description> #<issue>
+
+[optional body]
+
+AI-Context: reference | reasoning
 ```
-/
-├── .ai/
-│   ├── ARCHITECTURE.md    # 📖 READ THIS FIRST
-│   └── CONTEXT_LOG.md     # 📝 Session notes only
-├── .github/
-│   ├── copilot-instructions.md
-│   └── ISSUE_TEMPLATE/
-├── scripts/
-│   └── init_project.sh    # 🚀 Bootstrap script
-├── AGENTS.md              # 📋 YOU ARE HERE
-└── .cursorrules           # 🎯 Editor rules
-```
 
----
-
-*Protocol Version: 1.0.0*
-*Last Updated: 2024*

@@ -1,88 +1,84 @@
-# 🧠 GitHub Copilot Instructions
+# GitHub Copilot Instructions (GitCore Minimal)
 
 ## Prime Directive
-You are operating under the **Git-Core Protocol**. Your state is GitHub Issues, not internal memory.
 
----
+Operate under Git-Core `3.5.1` minimal profile.
 
-## ⛔ FORBIDDEN ACTIONS (HARD RULES)
+- Long-term state: GitHub Issues.
+- Session state: `.gitcore/planning/TASK.md`.
 
-**NEVER create these files under ANY circumstances:**
-- ❌ `TODO.md`, `TASKS.md`, `BACKLOG.md`
-- ❌ `PLANNING.md`, `ROADMAP.md`, `PROGRESS.md`
-- ❌ `NOTES.md`, `SCRATCH.md`, `IDEAS.md`
-- ❌ `STATUS.md`, `CHANGELOG.md` (for task tracking)
-- ❌ Any `.md` file for task/state management
-- ❌ Any `.txt` file for notes or todos
-- ❌ JSON/YAML files for task tracking
+## Required Context Load Order
 
-**If you feel the urge to create a document, STOP and ask yourself:**
-> "Can this be a GitHub Issue instead?" → **YES, it can. Create an issue.**
+1. `.gitcore/ARCHITECTURE.md`
+2. `.gitcore/AGENT_INDEX.md`
+3. `.gitcore/features.json`
+4. `.gitcore/planning/PLANNING.md`
+5. `.gitcore/planning/TASK.md`
+6. `docs/agent-docs/RESEARCH_STACK_CONTEXT.md`
 
----
+## Mandatory Health Check
 
-## Key Rules
-
-### 1. Token Economy
-- **NEVER** create documentation files for tracking state
-- **NEVER** use internal memory to track tasks
-- **ALWAYS** use `gh issue` commands for task management
-- **ALWAYS** use `gh issue comment` for progress updates
-
-### 2. Context Loading
-Before any task:
 ```bash
-# Read architecture
-cat .ai/ARCHITECTURE.md
-
-# Check your assigned issues
-gh issue list --assignee "@me"
-
-# If no assignment, check backlog
-gh issue list --limit 5
+gc check
+gc issue list --limit 5
+cat .gitcore/features.json
 ```
 
-### 3. Development Flow
-```bash
-# Take a task
-gh issue edit <id> --add-assignee "@me"
+## Planning Contract (Canonical Path Only)
 
-# Create branch
+Valid planning files:
+
+- `.gitcore/planning/PLANNING.md`
+- `.gitcore/planning/TASK.md`
+
+Do not use planning/task files elsewhere.
+
+## TASK.md Update Protocol
+
+When progress happens:
+
+1. Update task status.
+2. Add issue reference.
+3. Add commit hash when completed.
+4. Register newly discovered work.
+
+## Forbidden Tracking Files (Outside Canonical Planning Path)
+
+- `TODO.md`, `TASKS.md`, `BACKLOG.md`
+- `PLANNING.md`, `TASK.md`, `ROADMAP.md`, `PROGRESS.md`
+- `NOTES.md`, `SCRATCH.md`, `STATUS.md`, `CHECKLIST.md`
+- `IMPLEMENTATION*.md`, `SUMMARY.md`, `REPORT.md`
+
+## Allowed Documentation
+
+- `README*.md`, `AGENTS.md`, `CHANGELOG.md`, `LICENSE*`, `CONTRIBUTING*`
+- `.gitcore/**/*.md`
+- `.github/**/*.md`
+- `docs/**/*.md`
+
+## Tool Priority
+
+1. `gc` as primary interface.
+2. `gh` for GitHub-specific operations.
+3. Legacy scripts only as compatibility shims.
+
+## Standard Flow
+
+```bash
+# Assign and start
+gh issue edit <id> --add-assignee "@me"
 git checkout -b feat/issue-<id>
 
-# After coding, commit with reference
-git commit -m "feat: description (closes #<id>)"
+# Implement, verify, and update task state
+gc check
 
-# Create PR
+# Commit and PR
+git commit -m "feat(scope): description (closes #<id>)"
 gh pr create --fill
+gc report
 ```
 
-### 4. Planning Mode
-When asked to plan, generate `gh issue create` commands instead of documents:
-```bash
-gh issue create --title "TASK: Description" --body "Details..." --label "ai-plan"
-```
+## Architecture Override Rule
 
-**❌ WRONG:** Creating a `PLAN.md` or `ROADMAP.md` file
-**✅ RIGHT:** Running multiple `gh issue create` commands
+If issue text conflicts with `.gitcore/ARCHITECTURE.md`, architecture wins.
 
-### 5. Progress Updates
-When you need to document progress:
-```bash
-# Add comment to existing issue
-gh issue comment <id> --body "Progress: Completed X, working on Y"
-```
-
-**❌ WRONG:** Creating `PROGRESS.md` or updating a tracking file
-**✅ RIGHT:** Adding comments to the relevant GitHub Issue
-
-### 6. Code Standards
-- Follow existing code style
-- Write tests for new features
-- Use Conventional Commits
-- Keep PRs focused and small
-
-### 6. Communication
-- Be concise in commit messages
-- Reference issues in all commits
-- Update issue comments for significant progress
